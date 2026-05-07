@@ -120,7 +120,7 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
                     disabled && "pointer-events-none opacity-30"
                   )}
                 >
-                  <Icon size={13} weight="regular" />
+                  <Icon size={16} weight="regular" />
                 </button>
               );
             })}

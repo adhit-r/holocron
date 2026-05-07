@@ -15,15 +15,15 @@ const ERA_BANDS: Array<{ start: number; end: number; label: string; tone: "muted
   { start: 4, end: 35, label: "New Republic", tone: "dim" }
 ];
 
-const ANCHORS: Array<{ year: number; label: string }> = [
+const ANCHORS: Array<{ year: number; label: string; mobileHidden?: boolean }> = [
   { year: -25025, label: "Republic founding" },
-  { year: -3956, label: "Mandalorian Wars" },
-  { year: -1000, label: "Ruusan Reformation" },
-  { year: -22, label: "Clone Wars begin" },
-  { year: -19, label: "Order 66" },
+  { year: -3956, label: "Mandalorian Wars", mobileHidden: true },
+  { year: -1000, label: "Ruusan Reformation", mobileHidden: true },
+  { year: -22, label: "Clone Wars begin", mobileHidden: true },
+  { year: -19, label: "Order 66", mobileHidden: true },
   { year: 0, label: "Battle of Yavin" },
-  { year: 4, label: "Battle of Endor" },
-  { year: 34, label: "Starkiller Base" }
+  { year: 4, label: "Battle of Endor", mobileHidden: true },
+  { year: 34, label: "Starkiller Base", mobileHidden: true }
 ];
 
 export function TimelineScrubber() {
@@ -102,7 +102,7 @@ export function TimelineScrubber() {
         {ANCHORS.map((a) => {
           const left = yearToT(a.year) * 100;
           return (
-            <div key={a.year} className="absolute top-0 -translate-x-1/2" style={{ left: `${left}%` }}>
+            <div key={a.year} className={`absolute top-0 -translate-x-1/2 ${a.mobileHidden ? "hidden md:block" : ""}`} style={{ left: `${left}%` }}>
               <div className="h-2 w-px bg-fg-dim" aria-hidden />
               <span className="absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.08em] text-fg-dim">
                 {a.label}

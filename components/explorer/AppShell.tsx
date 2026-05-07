@@ -125,51 +125,35 @@ export function AppShell({
       <h1 className="sr-only">Holocron — Star Wars universe explorer</h1>
       {/* Desktop layout (md+): three-column grid + timeline row */}
       <div className="hidden h-full flex-col md:flex">
-        <div className="grid min-h-0 flex-1 grid-cols-[64px_1fr_360px] overflow-hidden">
-          <motion.div {...chrome("x", -32, 0)}>
-            <NavRail />
-          </motion.div>
-          <motion.div className="relative overflow-hidden" {...chrome("y", 16, 0.18)}>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={view}
-                variants={VIEW_VARIANTS}
-                initial={reduceMotion ? false : "initial"}
-                animate="animate"
-                exit="exit"
-                transition={viewTransition}
-                className="absolute inset-0"
-              >
-                {view === "galaxy" && (
-                  <GalaxyCanvas
-                    planets={planets}
-                    lanes={lanes}
-                    entities={entities}
-                    lineage={lineage}
-                  />
-                )}
-                {view === "timeline" && (
-                  <TimelineView
-                    planets={planets}
-                    lanes={lanes}
-                    events={events}
-                    entities={entities}
-                    wars={wars}
-                    battles={battles}
-                  />
-                )}
-                {view === "lineage" &&
-                  (lineage ? <LineageView graph={lineage} /> : <LineagePlaceholder />)}
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-          <motion.div {...chrome("x", 32, 0.06)}>
-            <Datapad
-              entities={entities}
-              planetImages={planetImages}
-              personImages={personImages}
-            />
-          </motion.div>
+        <div className="grid min-h-0 flex-1 grid-cols-[64px_1fr_minmax(260px,22vw)] overflow-hidden">
+          <NavRail />
+          <div className="relative overflow-hidden">
+            {view === "galaxy" && (
+              <GalaxyCanvas
+                planets={planets}
+                lanes={lanes}
+                entities={entities}
+                lineage={lineage}
+              />
+            )}
+            {view === "timeline" && (
+              <TimelineView
+                planets={planets}
+                lanes={lanes}
+                events={events}
+                entities={entities}
+                wars={wars}
+                battles={battles}
+              />
+            )}
+            {view === "lineage" &&
+              (lineage ? <LineageView graph={lineage} /> : <LineagePlaceholder />)}
+          </div>
+          <Datapad
+            entities={entities}
+            planetImages={planetImages}
+            personImages={personImages}
+          />
         </div>
         <motion.div {...chrome("y", 24, 0.12)}>
           <TimelineScrubber />
