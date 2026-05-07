@@ -12,6 +12,8 @@ import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { PlanetDetail } from "@/components/planet/PlanetDetail";
 import { HoloStageButton } from "@/components/holostage";
+import { EntityCrawl } from "@/components/EntityCrawl";
+import { Play } from "@phosphor-icons/react";
 
 type Props = {
   entities: Entity[];
@@ -38,6 +40,7 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
   const selectedId = useSelection((s) => s.entityId);
   const currentView = useSelection((s) => s.view);
   const setView = useSelection((s) => s.setView);
+  const [crawlOpen, setCrawlOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const entityMap = useMemo(() => {
@@ -50,6 +53,7 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
+    setCrawlOpen(false);
   }, [entity?.id]);
 
   return (
@@ -124,6 +128,16 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
                 </button>
               );
             })}
+            {entity.type === "film" && (
+              <button
+                type="button"
+                onClick={() => setCrawlOpen(true)}
+                className="flex h-9 items-center gap-2 rounded border border-border-faint bg-bg-panel/40 px-3 text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+              >
+                <Play size={14} weight="regular" />
+                <span className="font-mono text-xs uppercase tracking-[0.08em]">Crawl</span>
+              </button>
+            )}
             {entity.type === "person" && <HoloStageButton />}
           </div>
         )}
@@ -238,6 +252,12 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
           )}
         </AnimatePresence>
       </div>
+      <EntityCrawl
+        entity={entity ?? null}
+        entities={entities}
+        open={crawlOpen}
+        onClose={() => setCrawlOpen(false)}
+      />
     </motion.div>
   );
 }

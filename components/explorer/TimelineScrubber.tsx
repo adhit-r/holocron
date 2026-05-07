@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef } from "react";
 import { useSelection } from "@/lib/store";
-import { formatYear, clamp } from "@/lib/utils";
+import { formatYear, clamp, cn } from "@/lib/utils";
 
 const MIN_YEAR = -25025;
 const MAX_YEAR = 35;
@@ -102,9 +102,22 @@ export function TimelineScrubber() {
         {ANCHORS.map((a) => {
           const left = yearToT(a.year) * 100;
           return (
-            <div key={a.year} className={`absolute top-0 -translate-x-1/2 ${a.mobileHidden ? "hidden md:block" : ""}`} style={{ left: `${left}%` }}>
+            <div
+              key={a.year}
+              className={cn(
+                "absolute top-0 -translate-x-1/2",
+                a.mobileHidden && "hidden md:block"
+              )}
+              style={{ left: `${left}%` }}
+            >
               <div className="h-2 w-px bg-fg-dim" aria-hidden />
-              <span className="absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.08em] text-fg-dim">
+              <span
+                className={cn(
+                  "absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap px-2 font-mono text-[10px] uppercase tracking-[0.08em] text-fg-dim",
+                  left < 5 && "translate-x-0 left-0",
+                  left > 95 && "-translate-x-full left-auto right-0"
+                )}
+              >
                 {a.label}
               </span>
             </div>

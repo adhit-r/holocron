@@ -156,20 +156,19 @@ export function NavRail() {
         className="flex h-14 w-full items-center justify-between border-b border-border-faint bg-bg-canvas/80 px-3 backdrop-blur-md md:hidden"
         aria-label="Holocron navigation"
       >
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 min-w-0 flex-1">
           <Link
             href="/"
-            className="rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
+            className="flex-shrink-0 rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
             aria-label="Back to landing"
           >
-            <CaretLeft size={16} weight="regular" />
+            <CaretLeft size={20} weight="regular" />
           </Link>
-
+          
           <div
-            className="flex items-center gap-2 overflow-x-auto"
+            className="flex items-center gap-0.5"
             role="tablist"
             aria-label="View"
-            style={{ scrollbarWidth: "none" }}
           >
             {VIEWS.map(({ id, label, Icon }) => (
               <button
@@ -177,33 +176,34 @@ export function NavRail() {
                 role="tab"
                 aria-selected={view === id}
                 aria-label={label}
+                title={label}
                 type="button"
                 onClick={() => setView(id)}
                 className={cn(
-                  "flex flex-shrink-0 items-center gap-2 rounded-md px-3 py-2 transition-colors",
+                  "flex flex-shrink-0 items-center justify-center rounded-md p-2.5 transition-colors",
                   view === id
                     ? "bg-accent-bg/60 text-fg-strong"
                     : "text-fg-muted hover:bg-bg-panel/40 hover:text-fg-primary"
                 )}
               >
-                <Icon size={16} weight="regular" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em]">{label}</span>
+                <Icon size={20} weight="regular" />
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-shrink-0 items-center gap-0.5">
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="rounded-md border border-border-faint bg-bg-panel/40 p-2.5 text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+            className="rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
             aria-label="Open search"
           >
-            <MagnifyingGlass size={16} weight="regular" />
+            <MagnifyingGlass size={20} weight="regular" />
           </button>
           
-          <div className="hidden items-center gap-2 sm:flex">
+          {/* Mobile More Menu Placeholder - for now just keep them but more compact */}
+          <div className="flex items-center gap-0.5">
             <button
               type="button"
               onClick={() => {
@@ -211,15 +211,15 @@ export function NavRail() {
                 startRoute();
               }}
               className={cn(
-                "rounded-md border p-2.5 transition-colors",
+                "rounded-md p-2.5 transition-colors",
                 routeActive
-                  ? "border-accent/60 bg-accent-bg/50 text-fg-strong"
-                  : "border-border-faint bg-bg-panel/40 text-fg-muted hover:border-border-line hover:text-fg-primary"
+                  ? "bg-accent-bg/50 text-fg-strong"
+                  : "text-fg-muted hover:text-fg-primary"
               )}
               aria-pressed={routeActive}
               aria-label="Plot a hyperspace route"
             >
-              <Path size={16} weight="regular" />
+              <Path size={20} weight="regular" />
             </button>
             <AtlasToggle size="mini" />
             <AudioToggle size="mini" />

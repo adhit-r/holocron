@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import type { Entity } from "@/lib/schema";
+import { useSelection } from "@/lib/store";
 import { buildEntityCrawl } from "@/lib/utils";
 
 // Phase durations (milliseconds)
@@ -22,11 +23,13 @@ type Props = {
 };
 
 export function EntityCrawl({ entity, entities, open, onClose }: Props) {
+  const setGlobalCrawlOpen = useSelection((s) => s.setCrawlOpen);
   const [phase, setPhase] = useState<Phase>("lead");
 
   const finish = useCallback(() => {
     onClose();
-  }, [onClose]);
+    setGlobalCrawlOpen(false);
+  }, [onClose, setGlobalCrawlOpen]);
 
   // Reset phase each time the overlay opens
   useEffect(() => {
@@ -40,6 +43,7 @@ export function EntityCrawl({ entity, entities, open, onClose }: Props) {
     }
 
     setPhase("lead");
+    setGlobalCrawlOpen(true);
 
     const t1 = window.setTimeout(() => setPhase("title"), LEAD_MS);
     const t2 = window.setTimeout(() => setPhase("crawl"), LEAD_MS + TITLE_MS);
@@ -260,7 +264,7 @@ function SkipButton({ onSkip }: { onSkip: () => void }) {
         e.stopPropagation();
         onSkip();
       }}
-      className="fixed right-5 top-5 z-[91] inline-flex items-center gap-2 rounded-full border border-border-faint bg-bg-canvas/60 px-3 py-1.5 font-mono text-2xs uppercase tracking-[0.16em] text-fg-muted backdrop-blur-md transition-colors hover:border-border-line hover:text-fg-primary"
+      className="fixed right-5 top-8 z-[91] inline-flex items-center gap-2 rounded-full border border-border-faint bg-bg-canvas/60 px-4 py-2 font-mono text-2xs uppercase tracking-[0.16em] text-fg-muted backdrop-blur-md transition-colors hover:border-border-line hover:text-fg-primary"
       aria-label="Skip dossier sequence"
     >
       Skip crawl

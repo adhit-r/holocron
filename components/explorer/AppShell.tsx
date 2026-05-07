@@ -8,6 +8,7 @@ import type { LineageGraph } from "@/lib/data/loadLineage";
 import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { useSelection } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { GalaxyCanvas } from "@/components/galaxy/GalaxyCanvas";
 import { TimelineView } from "@/components/timeline/TimelineView";
@@ -74,6 +75,7 @@ export function AppShell({
   const startRoute = useSelection((s) => s.startRoute);
   const clearRoute = useSelection((s) => s.clearRoute);
   const routeMode = useSelection((s) => s.route.mode);
+  const crawlOpen = useSelection((s) => s.crawlOpen);
   const reduceMotion = useReducedMotion();
 
   // Build Motion props for chrome regions. Reduced-motion → `initial={false}`
@@ -155,14 +157,16 @@ export function AppShell({
             personImages={personImages}
           />
         </div>
-        <motion.div {...chrome("y", 24, 0.12)}>
+        {/* Hide (don't unmount) the scrubber while the cinematic crawl is open
+            so internal state — scrub position, faction toggles — survives. */}
+        <motion.div {...chrome("y", 24, 0.12)} className={crawlOpen ? "hidden" : ""}>
           <TimelineScrubber />
         </motion.div>
       </div>
 
       {/* Mobile layout (< md): stacked column */}
       <div className="flex h-full flex-col md:hidden">
-        <motion.div {...chrome("y", -16, 0)}>
+        <motion.div {...chrome("y", -16, 0)} className={crawlOpen ? "hidden" : ""}>
           <NavRail />
         </motion.div>
         <motion.div className="relative min-h-0 flex-1 overflow-hidden" {...chrome("y", 16, 0.12)}>
@@ -199,7 +203,7 @@ export function AppShell({
             </motion.div>
           </AnimatePresence>
         </motion.div>
-        <motion.div {...chrome("y", 24, 0.18)}>
+        <motion.div {...chrome("y", 24, 0.18)} className={crawlOpen ? "hidden" : ""}>
           <TimelineScrubber />
         </motion.div>
         <DatapadDrawer
