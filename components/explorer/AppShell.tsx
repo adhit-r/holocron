@@ -8,7 +8,6 @@ import type { LineageGraph } from "@/lib/data/loadLineage";
 import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { useSelection } from "@/lib/store";
-import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { GalaxyCanvas } from "@/components/galaxy/GalaxyCanvas";
 import { TimelineView } from "@/components/timeline/TimelineView";
