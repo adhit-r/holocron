@@ -58,7 +58,7 @@ export default async function Page() {
             <span className="font-mono text-2xs uppercase tracking-[0.22em] text-fg-dim">
               Galactic archive · v0.6
             </span>
-            <h1 className="text-4xl font-medium tracking-[-0.025em] text-fg-strong md:text-5xl">
+            <h1 className="text-3xl font-medium tracking-[-0.025em] text-fg-strong sm:text-4xl md:text-5xl">
               The galaxy, indexed.
               <br />
               <span className="text-fg-muted">Across space, time, and lineage.</span>
@@ -71,7 +71,7 @@ export default async function Page() {
             lineage graph of Force users, and an entity datapad. Pick anything, see it everywhere.
           </p>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-3">
             <PrimaryCTA href="/explore">Enter the archive</PrimaryCTA>
             <SecondaryCTA href="#sources">
               <Database size={16} weight="regular" />

@@ -38,6 +38,7 @@ export type SelectionState = {
   searchOpen: boolean;
   pivoting: boolean;
   holoStage: boolean;
+  crawlOpen: boolean;
   route: RouteState;
   story: StoryState;
   cinematic: CinematicState;
@@ -53,6 +54,7 @@ type SelectionActions = {
   setSearchOpen: (open: boolean) => void;
   setPivoting: (pivoting: boolean) => void;
   setHoloStage: (open: boolean) => void;
+  setCrawlOpen: (open: boolean) => void;
   startRoute: () => void;
   pickEndpoint: (planetId: string) => void;
   clearRoute: () => void;
@@ -96,6 +98,7 @@ const INITIAL: SelectionState = {
   searchOpen: false,
   pivoting: false,
   holoStage: false,
+  crawlOpen: false,
   route: INITIAL_ROUTE,
   story: INITIAL_STORY,
   cinematic: INITIAL_CINEMATIC
@@ -112,6 +115,7 @@ export const useSelection = create<SelectionState & SelectionActions>((set) => (
   setSearchOpen: (open) => set({ searchOpen: open }),
   setPivoting: (pivoting) => set({ pivoting }),
   setHoloStage: (open) => set({ holoStage: open }),
+  setCrawlOpen: (open) => set({ crawlOpen: open }),
   startRoute: () =>
     set({
       route: { mode: "picking-origin", originId: null, destinationId: null }

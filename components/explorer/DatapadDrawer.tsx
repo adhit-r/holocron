@@ -12,6 +12,8 @@ import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { PlanetDetail } from "@/components/planet/PlanetDetail";
 import { HoloStageButton } from "@/components/holostage";
+import { EntityCrawl } from "@/components/EntityCrawl";
+import { Play } from "@phosphor-icons/react";
 
 type Props = {
   entities: Entity[];
@@ -38,6 +40,7 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
   const selectedId = useSelection((s) => s.entityId);
   const currentView = useSelection((s) => s.view);
   const setView = useSelection((s) => s.setView);
+  const [crawlOpen, setCrawlOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const entityMap = useMemo(() => {
@@ -50,6 +53,7 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
+    setCrawlOpen(false);
   }, [entity?.id]);
 
   return (
@@ -120,10 +124,23 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
                     disabled && "pointer-events-none opacity-30"
                   )}
                 >
-                  <Icon size={13} weight="regular" />
+                  <Icon size={16} weight="regular" />
                 </button>
               );
             })}
+            {/* Crawl button — works for every entity (buildEntityCrawl
+                composes a per-entity crawl). Styling synced with desktop
+                Datapad header button (gap-1.5, no bg fill, 2xs label). */}
+            <button
+              type="button"
+              onClick={() => setCrawlOpen(true)}
+              aria-label="Play opening crawl for this entity"
+              title="Play crawl"
+              className="flex h-9 items-center gap-1.5 rounded border border-border-faint px-2.5 text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+            >
+              <Play size={11} weight="regular" />
+              <span className="font-mono text-2xs uppercase tracking-[0.14em]">Crawl</span>
+            </button>
             {entity.type === "person" && <HoloStageButton />}
           </div>
         )}
@@ -238,6 +255,12 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
           )}
         </AnimatePresence>
       </div>
+      <EntityCrawl
+        entity={entity ?? null}
+        entities={entities}
+        open={crawlOpen}
+        onClose={() => setCrawlOpen(false)}
+      />
     </motion.div>
   );
 }
