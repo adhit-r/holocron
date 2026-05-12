@@ -219,7 +219,10 @@ function CornerHud({ era }: { era: number }) {
       <div className="absolute left-4 top-4 hidden font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim sm:block">
         Timeline view · top-down
       </div>
-      <div className="absolute right-4 top-4 hidden font-mono text-sm text-fg-strong tabular-nums sm:block">
+      {/* Era readout — the only visual feedback for the scrubber drag, so
+          keep visible at all viewport widths (the three contextual labels
+          stay sm:block to avoid cluttering mobile). */}
+      <div className="absolute right-4 top-4 font-mono text-sm text-fg-strong tabular-nums">
         {formatYear(era)}
       </div>
       <div className="absolute bottom-4 left-4 hidden font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim sm:block">

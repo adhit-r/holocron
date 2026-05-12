@@ -128,16 +128,19 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
                 </button>
               );
             })}
-            {entity.type === "film" && (
-              <button
-                type="button"
-                onClick={() => setCrawlOpen(true)}
-                className="flex h-9 items-center gap-2 rounded border border-border-faint bg-bg-panel/40 px-3 text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
-              >
-                <Play size={14} weight="regular" />
-                <span className="font-mono text-xs uppercase tracking-[0.08em]">Crawl</span>
-              </button>
-            )}
+            {/* Crawl button — works for every entity (buildEntityCrawl
+                composes a per-entity crawl). Styling synced with desktop
+                Datapad header button (gap-1.5, no bg fill, 2xs label). */}
+            <button
+              type="button"
+              onClick={() => setCrawlOpen(true)}
+              aria-label="Play opening crawl for this entity"
+              title="Play crawl"
+              className="flex h-9 items-center gap-1.5 rounded border border-border-faint px-2.5 text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+            >
+              <Play size={11} weight="regular" />
+              <span className="font-mono text-2xs uppercase tracking-[0.14em]">Crawl</span>
+            </button>
             {entity.type === "person" && <HoloStageButton />}
           </div>
         )}

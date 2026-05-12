@@ -126,7 +126,9 @@ export function AppShell({
       <h1 className="sr-only">Holocron — Star Wars universe explorer</h1>
       {/* Desktop layout (md+): three-column grid + timeline row */}
       <div className="hidden h-full flex-col md:flex">
-        <div className="grid min-h-0 flex-1 grid-cols-[64px_1fr_minmax(260px,22vw)] overflow-hidden">
+        {/* Sidebar width: clamp(260, 22vw, 400) — at 1920px width, 22vw
+            (422px) exceeds the Datapad's calibrated max of ~360-400px. */}
+        <div className="grid min-h-0 flex-1 grid-cols-[64px_1fr_clamp(260px,22vw,400px)] overflow-hidden">
           <NavRail />
           <div className="relative overflow-hidden">
             {view === "galaxy" && (

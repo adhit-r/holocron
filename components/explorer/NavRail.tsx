@@ -166,7 +166,7 @@ export function NavRail() {
           </Link>
           
           <div
-            className="flex items-center gap-0.5"
+            className="flex items-center gap-0.5 overflow-x-auto"
             role="tablist"
             aria-label="View"
           >
@@ -202,7 +202,6 @@ export function NavRail() {
             <MagnifyingGlass size={20} weight="regular" />
           </button>
           
-          {/* Mobile More Menu Placeholder - for now just keep them but more compact */}
           <div className="flex items-center gap-0.5">
             <button
               type="button"
@@ -220,6 +219,27 @@ export function NavRail() {
               aria-label="Plot a hyperspace route"
             >
               <Path size={20} weight="regular" />
+            </button>
+            {/* Legends layer toggle — desktop NavRail has the full "L on/off"
+                pill (lines 132-147); mobile needs the same affordance compact
+                enough to fit the action row. Inlined rather than added as a
+                third toggle component since the desktop variant already lives
+                inline above. */}
+            <button
+              type="button"
+              onClick={toggleLegends}
+              aria-pressed={showLegends}
+              aria-label={showLegends ? "Legends layer on" : "Legends layer off"}
+              title={showLegends ? "Legends layer on" : "Legends layer off"}
+              className={cn(
+                "flex items-center gap-1 rounded-md border px-2 py-1.5 font-mono text-2xs uppercase tracking-[0.08em] transition-colors",
+                showLegends
+                  ? "border-legends/50 bg-legends/10 text-legends"
+                  : "border-border-faint text-fg-muted hover:border-border-line hover:text-fg-primary"
+              )}
+            >
+              <span className="font-semibold">L</span>
+              {showLegends && <span>on</span>}
             </button>
             <AtlasToggle size="mini" />
             <AudioToggle size="mini" />

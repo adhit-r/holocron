@@ -55,8 +55,13 @@ export function EntityCrawl({ entity, entities, open, onClose }: Props) {
       window.clearTimeout(t2);
       window.clearTimeout(t3);
       window.clearTimeout(t4);
+      // Defensive: if `open` is flipped false externally (parent unmounted,
+      // route change, etc.) without `finish()` firing, the global crawlOpen
+      // slice would stay `true` and AppShell would hide chrome forever.
+      // Calling it here is idempotent with the finish() path.
+      setGlobalCrawlOpen(false);
     };
-  }, [open, entity, finish]);
+  }, [open, entity, finish, setGlobalCrawlOpen]);
 
   // Keyboard skip: Esc, Enter, Space
   useEffect(() => {
