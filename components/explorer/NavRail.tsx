@@ -15,6 +15,15 @@ import { useSelection, type ViewMode } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { AtlasToggle } from "./AtlasToggle";
 import { AudioToggle } from "./AudioToggle";
+import { AnimatePresence } from "motion/react";
+import { STORIES } from "@/lib/data/stories";
+
+const STORY_ABBRS: Record<string, string> = {
+  "rise-of-vader": "RoV",
+  "order-of-the-sith": "OoS",
+  "skywalker-family": "SkF",
+  "clone-wars": "CW"
+};
 
 const TAB_SPRING = { type: "spring", stiffness: 380, damping: 32, mass: 0.8 } as const;
 
@@ -36,6 +45,7 @@ export function NavRail() {
   const playStory = useSelection((s) => s.playStory);
   const playingStoryId = useSelection((s) => s.story.playingStoryId);
   const storyActive = playingStoryId !== null;
+  const storyAbbr = playingStoryId ? STORY_ABBRS[playingStoryId] ?? STORIES.find(s => s.id === playingStoryId)?.title.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase() : null;
   const reduceMotion = useReducedMotion();
   const tabTransition = reduceMotion ? { duration: 0 } : TAB_SPRING;
 
@@ -123,7 +133,7 @@ export function NavRail() {
               playStory("rise-of-vader");
             }}
             className={cn(
-              "rounded-md border p-2.5 transition-colors",
+              "relative rounded-md border p-2.5 transition-colors",
               storyActive
                 ? "border-accent/60 bg-accent-bg/50 text-fg-strong"
                 : "border-border-faint text-fg-muted hover:border-border-line hover:text-fg-primary"
@@ -133,6 +143,19 @@ export function NavRail() {
             title="Play story · Rise of Vader"
           >
             <Play size={16} weight="regular" />
+            <AnimatePresence>
+              {storyAbbr && (
+                <motion.span
+                  initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
+                  className="absolute -bottom-1 -right-1 flex h-4 min-w-[1.2rem] items-center justify-center rounded-sm bg-accent px-0.5 font-mono text-[8px] font-bold uppercase leading-none text-accent-fg shadow-sm"
+                  aria-live="polite"
+                >
+                  {storyAbbr}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
 
           <button
@@ -238,7 +261,7 @@ export function NavRail() {
               playStory("rise-of-vader");
             }}
             className={cn(
-              "rounded-md border p-2.5 transition-colors",
+              "relative rounded-md border p-2.5 transition-colors",
               storyActive
                 ? "border-accent/60 bg-accent-bg/50 text-fg-strong"
                 : "border-border-faint bg-bg-panel/40 text-fg-muted hover:border-border-line hover:text-fg-primary"
@@ -247,6 +270,19 @@ export function NavRail() {
             aria-label="Play story: Rise of Vader"
           >
             <Play size={14} weight="regular" />
+            <AnimatePresence>
+              {storyAbbr && (
+                <motion.span
+                  initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
+                  className="absolute -bottom-1 -right-1 flex h-4 min-w-[1.2rem] items-center justify-center rounded-sm bg-accent px-0.5 font-mono text-[8px] font-bold uppercase leading-none text-accent-fg shadow-sm"
+                  aria-live="polite"
+                >
+                  {storyAbbr}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
           <button
             type="button"
