@@ -24,6 +24,10 @@ export function IntroCanvas({ className }: Props) {
     }
   }, []);
 
+  if (supportsWebGL === null) {
+    return <div className={className} />;
+  }
+
   if (supportsWebGL === false) {
     return (
       <div

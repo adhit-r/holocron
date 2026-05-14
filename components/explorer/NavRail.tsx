@@ -8,7 +8,8 @@ import {
   MagnifyingGlass,
   CaretLeft,
   Path,
-  Play
+  Play,
+  Rocket
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useSelection, type ViewMode } from "@/lib/store";
@@ -46,6 +47,9 @@ export function NavRail() {
   const playingStoryId = useSelection((s) => s.story.playingStoryId);
   const storyActive = playingStoryId !== null;
   const storyAbbr = playingStoryId ? STORY_ABBRS[playingStoryId] ?? STORIES.find(s => s.id === playingStoryId)?.title.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase() : null;
+  const timeMachineActive = useSelection((s) => s.timeMachine.active);
+  const startTimeMachine = useSelection((s) => s.startTimeMachine);
+  const stopTimeMachine = useSelection((s) => s.stopTimeMachine);
   const reduceMotion = useReducedMotion();
   const tabTransition = reduceMotion ? { duration: 0 } : TAB_SPRING;
 
@@ -159,6 +163,29 @@ export function NavRail() {
                 </motion.span>
               )}
             </AnimatePresence>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (timeMachineActive) stopTimeMachine();
+              else startTimeMachine();
+            }}
+            className={cn(
+              "rounded-md border p-2.5 transition-colors",
+              timeMachineActive
+                ? "border-accent/60 bg-accent-bg/50 text-accent shadow-[0_0_12px_var(--color-accent-faint)]"
+                : "border-border-faint text-fg-muted hover:border-border-line hover:text-fg-primary"
+            )}
+            aria-pressed={timeMachineActive}
+            aria-label="Toggle Time Machine"
+            title="Time Machine · 25,000 year cinematic scrub"
+          >
+            <Rocket 
+              size={16} 
+              weight={timeMachineActive ? "fill" : "regular"} 
+              className={cn(timeMachineActive && "animate-pulse")}
+            />
           </button>
 
           <button
@@ -289,6 +316,27 @@ export function NavRail() {
                 </motion.span>
               )}
             </AnimatePresence>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (timeMachineActive) stopTimeMachine();
+              else startTimeMachine();
+            }}
+            className={cn(
+              "rounded-md border p-2.5 transition-colors",
+              timeMachineActive
+                ? "border-accent/60 bg-accent-bg/50 text-accent shadow-[0_0_10px_var(--color-accent-faint)]"
+                : "border-border-faint bg-bg-panel/40 text-fg-muted hover:border-border-line hover:text-fg-primary"
+            )}
+            aria-pressed={timeMachineActive}
+            aria-label="Toggle Time Machine"
+          >
+            <Rocket 
+              size={14} 
+              weight={timeMachineActive ? "fill" : "regular"} 
+              className={cn(timeMachineActive && "animate-pulse")}
+            />
           </button>
           <button
             type="button"

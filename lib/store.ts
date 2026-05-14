@@ -41,6 +41,7 @@ export type SelectionState = {
   route: RouteState;
   story: StoryState;
   cinematic: CinematicState;
+  timeMachine: { active: boolean; paused: boolean };
 };
 
 type SelectionActions = {
@@ -67,6 +68,10 @@ type SelectionActions = {
   fireCinematic: (id: string) => void;
   clearCinematic: () => void;
   resetCinematicFired: () => void;
+  // Time Machine
+  startTimeMachine: () => void;
+  stopTimeMachine: () => void;
+  toggleTimeMachinePause: () => void;
 };
 
 const INITIAL_ROUTE: RouteState = {
@@ -98,8 +103,11 @@ const INITIAL: SelectionState = {
   holoStage: false,
   route: INITIAL_ROUTE,
   story: INITIAL_STORY,
-  cinematic: INITIAL_CINEMATIC
+  cinematic: INITIAL_CINEMATIC,
+  timeMachine: { active: false, paused: false }
 };
+
+const START_YEAR = -25025;
 
 export const useSelection = create<SelectionState & SelectionActions>((set) => ({
   ...INITIAL,
@@ -171,5 +179,16 @@ export const useSelection = create<SelectionState & SelectionActions>((set) => (
   clearCinematic: () =>
     set((s) => ({ cinematic: { ...s.cinematic, activeId: null } })),
   resetCinematicFired: () =>
-    set({ cinematic: { activeId: null, fired: new Set<string>() } })
+    set({ cinematic: { activeId: null, fired: new Set<string>() } }),
+  // Time Machine ───────────────────────────────────────────────────────────
+  startTimeMachine: () =>
+    set((s) => ({
+      timeMachine: { active: true, paused: false },
+      era: s.timeMachine.active ? s.era : START_YEAR,
+      story: { ...INITIAL_STORY },
+      cinematic: { activeId: null, fired: new Set<string>() }
+    })),
+  stopTimeMachine: () => set({ timeMachine: { active: false, paused: false } }),
+  toggleTimeMachinePause: () =>
+    set((s) => ({ timeMachine: { ...s.timeMachine, paused: !s.timeMachine.paused } }))
 }));

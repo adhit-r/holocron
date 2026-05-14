@@ -86,6 +86,10 @@ export function TimelineView({
     return map;
   }, [battles, planets]);
 
+  if (supportsWebGL === null) {
+    return <div className="h-full w-full bg-bg-canvas" />;
+  }
+
   if (supportsWebGL === false) {
     return <FallbackTimeline planets={planets} era={era} />;
   }
