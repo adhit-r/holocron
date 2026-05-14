@@ -95,6 +95,7 @@ export type PlacedPlanet = {
   position: [number, number, number];
   size: number;
   canonicity: Entity["canonicity"];
+  physical?: Entity["physical"];
 };
 
 export function placePlanets(planets: Entity[]): PlacedPlanet[] {
@@ -138,7 +139,8 @@ export function placePlanets(planets: Entity[]): PlacedPlanet[] {
       short: p.short,
       position: pos,
       size,
-      canonicity: p.canonicity
+      canonicity: p.canonicity,
+      physical: p.physical
     });
   }
 
