@@ -1,9 +1,14 @@
 import Link from "next/link";
 import { ArrowRight, Database, MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
-import { Wordmark } from "@/components/Wordmark";
 import { IntroCanvas } from "@/components/IntroCanvas";
 import { OpeningCrawl } from "@/components/OpeningCrawl";
 import { Aurebesh } from "@/components/Aurebesh";
+import { 
+  MayTheFourthBanner, 
+  MayTheFourthTagline, 
+  MayTheFourthWordmark,
+  MayTheFourthCrosshair
+} from "@/components/MayTheFourth";
 import { loadManifest } from "@/lib/data/loadManifest";
 import { loadLanes } from "@/lib/data/loadLanes";
 
@@ -37,12 +42,13 @@ export default async function Page() {
 
   return (
     <main id="main-content" className="relative min-h-[100dvh] w-full overflow-hidden">
+      <MayTheFourthBanner />
       <OpeningCrawl />
       <BackgroundCanvas />
 
       <div className="relative z-10 mx-auto grid min-h-[100dvh] max-w-[1400px] grid-cols-1 gap-0 px-6 py-8 md:grid-cols-12 md:gap-8 md:px-10 md:py-10">
         <header className="col-span-full flex items-center justify-between md:col-span-12">
-          <Wordmark size="md" />
+          <MayTheFourthWordmark size="md" />
           <nav className="hidden items-center gap-6 text-sm md:flex">
             <BuildBadge builtAt={manifest?.builtAt ?? null} />
             <Link
@@ -62,7 +68,7 @@ export default async function Page() {
             <h1 className="text-4xl font-medium tracking-[-0.025em] text-fg-strong md:text-5xl">
               The galaxy, indexed.
               <br />
-              <span className="text-fg-muted">Across space, time, and lineage.</span>
+              <MayTheFourthTagline />
             </h1>
           </div>
 
@@ -208,30 +214,9 @@ function CornerLabels() {
         <MagnifyingGlass size={11} weight="regular" />
         <span>Press / to search</span>
       </span>
-      <Crosshair className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+      <MayTheFourthCrosshair className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
     </div>
   );
 }
 
-function Crosshair({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 80 80"
-      width="80"
-      height="80"
-      className={className}
-      aria-hidden
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1"
-      style={{ color: "oklch(0.30 0.05 235)" }}
-    >
-      <circle cx="40" cy="40" r="22" />
-      <line x1="40" y1="2" x2="40" y2="14" />
-      <line x1="40" y1="66" x2="40" y2="78" />
-      <line x1="2" y1="40" x2="14" y2="40" />
-      <line x1="66" y1="40" x2="78" y2="40" />
-      <circle cx="40" cy="40" r="1.5" fill="oklch(0.78 0.13 235)" />
-    </svg>
-  );
-}
+
