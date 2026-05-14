@@ -14,6 +14,7 @@ import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { PlanetDetail } from "@/components/planet/PlanetDetail";
 import { HoloStageButton } from "@/components/holostage";
+import { Aurebesh } from "@/components/Aurebesh";
 
 type Props = {
   entities: Entity[];
@@ -200,7 +201,7 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
               {entity.era && (
                 <div className="flex flex-col gap-1 border-t border-border-faint pt-4">
                   <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
-                    Era
+                    <Aurebesh char="E" />ra
                   </span>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-sm">
                     {entity.era.birthYear != null && (
@@ -226,7 +227,7 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
               {entity.relations.length > 0 && (
                 <div className="flex flex-col gap-2 border-t border-border-faint pt-4">
                   <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
-                    Relations
+                    <Aurebesh char="R" />elations
                   </span>
                   <ul className="flex flex-col divide-y divide-border-faint/60">
                     {entity.relations.slice(0, 14).map((r, i) => {
@@ -253,7 +254,7 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
               {entity.sources.length > 0 && (
                 <div className="flex flex-col gap-2 border-t border-border-faint pt-4">
                   <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
-                    Sources
+                    <Aurebesh char="S" />ources
                   </span>
                   <ul className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-2xs text-fg-muted">
                     {entity.sources.map((s) => (
@@ -294,7 +295,7 @@ function LoreSection({ long, entityId }: { long: string; entityId: string }) {
 
   return (
     <div className="flex flex-col gap-1 border-t border-border-faint pt-4">
-      <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">Lore</span>
+      <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim"><Aurebesh char="L" />ore</span>
       <motion.div layout transition={LORE_SPRING} className="overflow-hidden">
         <p className="max-w-[65ch] text-base leading-relaxed text-fg-primary/85">{displayText}</p>
         {needsTruncation && (

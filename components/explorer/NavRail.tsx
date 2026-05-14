@@ -59,10 +59,13 @@ export function NavRail() {
         <div className="flex flex-col items-center gap-5">
           <Link
             href="/"
-            className="rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
+            className="group relative rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
             aria-label="Back to landing"
           >
             <CaretLeft size={16} weight="regular" />
+            <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.15em] text-fg-dim opacity-0 transition-opacity group-hover:opacity-100">
+              Aurebesh: <span className="text-fg-muted">K</span> (Krill)
+            </span>
           </Link>
 
           <button
@@ -188,10 +191,13 @@ export function NavRail() {
         <div className="flex items-center gap-1">
           <Link
             href="/"
-            className="rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
+            className="group relative rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
             aria-label="Back to landing"
           >
             <CaretLeft size={16} weight="regular" />
+            <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.15em] text-fg-dim opacity-0 transition-opacity group-hover:opacity-100">
+              Aurebesh: <span className="text-fg-muted">K</span> (Krill)
+            </span>
           </Link>
 
           <div

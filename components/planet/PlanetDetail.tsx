@@ -11,6 +11,7 @@ import { StatDashboard } from "./StatDashboard";
 import { NotableResidents } from "./NotableResidents";
 import { FilmAppearances } from "./FilmAppearances";
 import { formatYear } from "@/lib/utils";
+import { Aurebesh } from "@/components/Aurebesh";
 
 /**
  * <PlanetDetail /> — wiki-style detail surface for a planet entity.
@@ -79,7 +80,7 @@ export function PlanetDetail({
 
         {entity.era && (entity.era.firstAppearance != null || entity.era.lastAppearance != null) && (
           <div className="flex flex-col gap-1 border-t border-border-faint pt-4">
-            <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">Era</span>
+            <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim"><Aurebesh char="E" />ra</span>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-sm">
               {entity.era.firstAppearance != null && (
                 <Row label="first seen" value={formatYear(entity.era.firstAppearance)} />
@@ -94,7 +95,7 @@ export function PlanetDetail({
         {entity.sources.length > 0 && (
           <div className="flex flex-col gap-2 border-t border-border-faint pt-4">
             <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
-              Sources
+              <Aurebesh char="S" />ources
             </span>
             <ul className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-2xs text-fg-muted">
               {entity.sources.map((s) => (
@@ -151,7 +152,7 @@ function LoreSection({ long, entityId }: { long: string; entityId: string }) {
 
   return (
     <div className="flex flex-col gap-1 border-t border-border-faint pt-4">
-      <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">Lore</span>
+      <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim"><Aurebesh char="L" />ore</span>
       <motion.div layout transition={LORE_SPRING} className="overflow-hidden">
         <p className="max-w-[65ch] text-base leading-relaxed text-fg-primary/85">{displayText}</p>
         {needsTruncation && (

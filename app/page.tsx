@@ -3,6 +3,7 @@ import { ArrowRight, Database, MagnifyingGlass } from "@phosphor-icons/react/dis
 import { Wordmark } from "@/components/Wordmark";
 import { IntroCanvas } from "@/components/IntroCanvas";
 import { OpeningCrawl } from "@/components/OpeningCrawl";
+import { Aurebesh } from "@/components/Aurebesh";
 import { loadManifest } from "@/lib/data/loadManifest";
 import { loadLanes } from "@/lib/data/loadLanes";
 
@@ -128,6 +129,11 @@ export default async function Page() {
           >
             Replay intro
           </Link>
+          <div className="mt-4 flex items-center justify-center border-t border-border-faint pt-4 md:mt-0 md:border-t-0 md:pt-0">
+            <Aurebesh className="font-mono text-[10px] tracking-[0.2em] text-fg-dim/50 transition-opacity hover:text-fg-dim">
+              HOLOCRON
+            </Aurebesh>
+          </div>
         </footer>
       </div>
     </main>
