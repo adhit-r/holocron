@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Pause, Play, X, SkipForward, SkipBack } from "@phosphor-icons/react";
+import { Pause, Play, X, SkipForward, SkipBack, ShareNetwork, Check } from "@phosphor-icons/react";
 import { useSelection } from "@/lib/store";
 import { findStory, type StoryBeat } from "@/lib/data/stories";
 
@@ -42,6 +42,22 @@ export function StoryMode() {
   const inOutro = story !== null && beatIndex >= totalBeats;
   const currentBeat: StoryBeat | null =
     story && !inIntro && !inOutro ? story.beats[beatIndex] ?? null : null;
+  
+  // Sync state to URL deeplink.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (playingId) {
+      url.searchParams.set("story", playingId);
+      url.searchParams.set("beat", beatIndex.toString());
+      if (paused) url.searchParams.set("paused", "true");
+      else url.searchParams.delete("paused");
+    } else {
+      url.searchParams.delete("story");
+      url.searchParams.delete("beat");
+      url.searchParams.delete("paused");
+    }
+    window.history.replaceState(null, "", url.toString());
+  }, [playingId, beatIndex, paused]);
 
   // Advance timer — runs while a beat is active and not paused.
   useEffect(() => {
@@ -329,11 +345,53 @@ function StoryControls({
         </span>
 
         <span aria-hidden className="mx-1 h-5 w-px bg-border-faint" />
+        <ShareButton />
         <ControlButton onClick={onEnd} ariaLabel="End story">
           <X size={16} weight="regular" />
         </ControlButton>
       </div>
     </motion.div>
+  );
+}
+
+function ShareButton() {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy URL:", err);
+    }
+  };
+
+  return (
+    <ControlButton onClick={handleShare} ariaLabel="Share this beat">
+      <AnimatePresence mode="wait" initial={false}>
+        {copied ? (
+          <motion.div
+            key="check"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+            className="text-accent"
+          >
+            <Check size={16} weight="bold" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="share"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+          >
+            <ShareNetwork size={16} weight="regular" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </ControlButton>
   );
 }
 

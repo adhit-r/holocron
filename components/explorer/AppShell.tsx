@@ -8,6 +8,7 @@ import type { LineageGraph } from "@/lib/data/loadLineage";
 import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { useSelection } from "@/lib/store";
+import { findStory } from "@/lib/data/stories";
 import dynamic from "next/dynamic";
 import { GalaxyCanvas } from "@/components/galaxy/GalaxyCanvas";
 import { TimelineView } from "@/components/timeline/TimelineView";
@@ -29,6 +30,7 @@ import { HyperspaceOverlay } from "./HyperspaceOverlay";
 import { AudioCueDispatcher } from "./AudioCueDispatcher";
 import { HoloStage } from "@/components/holostage";
 import { EventInterruptDispatcher, EventInterruptOverlay, StoryMode } from "@/components/cinematic";
+import { MemoryPalace } from "@/components/game/MemoryPalace";
 
 type Props = {
   entities: Entity[];
@@ -119,6 +121,20 @@ export function AppShell({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [setSearchOpen, startRoute, clearRoute, routeMode]);
+
+  // Handle story deeplinks on mount.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const storyId = params.get("story");
+    const beatStr = params.get("beat");
+    const isPaused = params.get("paused") === "true";
+
+    if (storyId && findStory(storyId)) {
+      const beatIndex = beatStr ? parseInt(beatStr, 10) : -1;
+      useSelection.getState().playStory(storyId, beatIndex);
+      if (isPaused) useSelection.getState().pauseStory();
+    }
+  }, []);
 
   return (
     <div id="main-content" className="relative h-[100dvh] w-full bg-bg-canvas">
@@ -232,6 +248,7 @@ export function AppShell({
       <EventInterruptDispatcher />
       <EventInterruptOverlay />
       <StoryMode />
+      <MemoryPalace />
     </div>
   );
 }

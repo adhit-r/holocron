@@ -70,7 +70,7 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
       <header className="flex items-center justify-between border-b border-border-faint px-5 py-3">
         <h2 className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">Datapad</h2>
         <div className="flex items-center gap-2">
-          {entity && (
+          {entity && (entity.type === "person" || entity.type === "planet" || entity.type === "ship" || entity.type === "vehicle" || entity.type === "film" || entity.type === "event") && (
             <button
               type="button"
               onClick={() => setCrawlOpen(true)}
