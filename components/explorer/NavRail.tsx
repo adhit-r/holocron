@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, AnimatePresence } from "motion/react";
 import {
   GlobeHemisphereWest,
   Clock,
@@ -8,14 +8,14 @@ import {
   MagnifyingGlass,
   CaretLeft,
   Path,
-  Play
+  Play,
+  Brain
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useSelection, type ViewMode } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { AtlasToggle } from "./AtlasToggle";
 import { AudioToggle } from "./AudioToggle";
-import { AnimatePresence } from "motion/react";
 import { STORIES } from "@/lib/data/stories";
 
 const STORY_ABBRS: Record<string, string> = {
@@ -178,6 +178,23 @@ export function NavRail() {
             <span className="text-[8px] tracking-[0.18em]">{showLegends ? "on" : "off"}</span>
           </button>
 
+          <button
+            type="button"
+            onClick={() => {
+              // Trigger the start screen in MemoryPalace component
+              // via a custom event or store state.
+              // For now, I'll add a 'gameOpen' state to the store if needed,
+              // but I already have 'game.active'.
+              // I'll add a way to toggle the start screen.
+              window.dispatchEvent(new CustomEvent("holocron:open-game"));
+            }}
+            className="rounded-md border border-border-faint p-2.5 text-fg-muted transition-colors hover:border-accent/60 hover:text-accent"
+            aria-label="Play Memory Palace"
+            title="Play Memory Palace"
+          >
+            <Brain size={16} weight="regular" />
+          </button>
+
           <AtlasToggle size="rail" />
           <AudioToggle size="rail" />
         </div>
@@ -303,6 +320,14 @@ export function NavRail() {
             aria-label={showLegends ? "Legends layer on" : "Legends layer off"}
           >
             {showLegends ? "+ Legends" : "Legends"}
+          </button>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("holocron:open-game"))}
+            className="rounded-md border border-border-faint p-2.5 text-fg-muted"
+            aria-label="Play Memory Palace"
+          >
+            <Brain size={14} weight="regular" />
           </button>
           <AtlasToggle size="mini" />
           <AudioToggle size="mini" />

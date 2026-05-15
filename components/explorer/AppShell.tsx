@@ -29,6 +29,7 @@ import { HyperspaceOverlay } from "./HyperspaceOverlay";
 import { AudioCueDispatcher } from "./AudioCueDispatcher";
 import { HoloStage } from "@/components/holostage";
 import { EventInterruptDispatcher, EventInterruptOverlay, StoryMode } from "@/components/cinematic";
+import { MemoryPalace } from "@/components/game/MemoryPalace";
 
 type Props = {
   entities: Entity[];
@@ -232,6 +233,7 @@ export function AppShell({
       <EventInterruptDispatcher />
       <EventInterruptOverlay />
       <StoryMode />
+      <MemoryPalace />
     </div>
   );
 }
