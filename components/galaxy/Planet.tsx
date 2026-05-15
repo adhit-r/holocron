@@ -73,6 +73,12 @@ function PlanetImpl({ planet, showLabel = true }: Props) {
         }}
         onClick={(e) => {
           e.stopPropagation();
+          const gameState = useSelection.getState().game;
+          if (gameState.active && !gameState.feedback.active) {
+            const isCorrect = planet.id === gameState.targetId;
+            useSelection.getState().submitGuess(planet.id, isCorrect);
+            return;
+          }
           if (routeMode === "picking-origin" || routeMode === "picking-destination") {
             pickEndpoint(planet.id);
             return;

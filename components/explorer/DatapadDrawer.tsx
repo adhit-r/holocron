@@ -2,11 +2,13 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useMemo, useEffect, useRef } from "react";
-import { CaretUp, CaretDown, GlobeHemisphereWest, Clock, TreeStructure } from "@phosphor-icons/react";
+import { CaretUp, CaretDown, GlobeHemisphereWest, Clock, TreeStructure, Play, FilmStrip } from "@phosphor-icons/react";
 import type { Entity } from "@/lib/schema";
 import { useSelection, type ViewMode } from "@/lib/store";
 import { formatYear, cn } from "@/lib/utils";
+import { EntityCrawl } from "@/components/EntityCrawl";
 import { loadAllQuotesFor } from "@/lib/data/loadQuotes";
+import { CLIP_LINKS_MAP } from "@/lib/data/clip-links";
 import type { Quote } from "@/lib/data/quotes";
 import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
@@ -35,10 +37,15 @@ const PIVOT_VIEWS: Array<{
 
 export function DatapadDrawer({ entities, planetImages = null, personImages = null }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [crawlOpen, setCrawlOpen] = useState(false);
   const selectedId = useSelection((s) => s.entityId);
   const currentView = useSelection((s) => s.view);
   const setView = useSelection((s) => s.setView);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!selectedId) setCrawlOpen(false);
+  }, [selectedId]);
 
   const entityMap = useMemo(() => {
     const m = new Map<string, Entity>();
@@ -100,7 +107,37 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
         </button>
 
         {entity && (
-          <div className="ml-3 flex items-center gap-1">
+          <div className="ml-3 flex items-center gap-1.5">
+            {(entity.type === "person" ||
+              entity.type === "planet" ||
+              entity.type === "ship" ||
+              entity.type === "vehicle" ||
+              entity.type === "film" ||
+              entity.type === "event") && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCrawlOpen(true);
+                }}
+                aria-label="Play crawl"
+                className="flex h-9 w-9 items-center justify-center rounded border border-border-faint text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+              >
+                <Play size={12} weight="regular" />
+              </button>
+            )}
+            {entity.type === "film" && CLIP_LINKS_MAP.get(entity.id) && (
+              <a
+                href={CLIP_LINKS_MAP.get(entity.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Watch clip"
+                className="flex h-9 w-9 items-center justify-center rounded border border-border-faint text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+              >
+                <FilmStrip size={13} weight="regular" />
+              </a>
+            )}
             {PIVOT_VIEWS.map(({ id, label, Icon, personOnly }) => {
               const disabled = personOnly && entity.type !== "person";
               const isActive = currentView === id;
@@ -111,7 +148,10 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
                   aria-label={label}
                   title={label}
                   disabled={disabled}
-                  onClick={() => setView(id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setView(id);
+                  }}
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded border transition-colors",
                     isActive
@@ -238,6 +278,12 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
           )}
         </AnimatePresence>
       </div>
+      <EntityCrawl
+        entity={entity ?? null}
+        entities={entities}
+        open={crawlOpen}
+        onClose={() => setCrawlOpen(false)}
+      />
     </motion.div>
   );
 }
