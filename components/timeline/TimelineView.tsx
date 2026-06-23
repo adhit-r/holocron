@@ -86,6 +86,10 @@ export function TimelineView({
     return map;
   }, [battles, planets]);
 
+  if (supportsWebGL === null) {
+    return <div className="h-full w-full bg-bg-canvas" />;
+  }
+
   if (supportsWebGL === false) {
     return <FallbackTimeline planets={planets} era={era} />;
   }
@@ -216,16 +220,19 @@ function TopDownController({ planets }: { planets: PlacedPlanet[] }) {
 function CornerHud({ era }: { era: number }) {
   return (
     <div className="pointer-events-none absolute inset-0">
-      <div className="absolute left-4 top-4 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
+      <div className="absolute left-4 top-4 hidden font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim sm:block">
         Timeline view · top-down
       </div>
+      {/* Era readout — the only visual feedback for the scrubber drag, so
+          keep visible at all viewport widths (the three contextual labels
+          stay sm:block to avoid cluttering mobile). */}
       <div className="absolute right-4 top-4 font-mono text-sm text-fg-strong tabular-nums">
         {formatYear(era)}
       </div>
-      <div className="absolute bottom-4 left-4 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
+      <div className="absolute bottom-4 left-4 hidden font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim sm:block">
         Click a planet · scrub to seek
       </div>
-      <div className="absolute bottom-4 right-4 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
+      <div className="absolute bottom-4 right-4 hidden font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim sm:block">
         Hyperspace lanes · 5 routes
       </div>
     </div>

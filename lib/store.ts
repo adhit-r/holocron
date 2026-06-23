@@ -6,6 +6,20 @@ import type { EntityType } from "./schema";
 export type ViewMode = "galaxy" | "timeline" | "lineage";
 
 export type RouteMode = "idle" | "picking-origin" | "picking-destination" | "shown";
+export type GameDifficulty = "easy" | "medium" | "legends";
+
+export type GameState = {
+  active: boolean;
+  difficulty: GameDifficulty;
+  currentRound: number;
+  score: number;
+  targetId: string | null;
+  feedback: {
+    active: boolean;
+    lastGuessId: string | null;
+    isCorrect: boolean;
+  };
+};
 
 export type RouteState = {
   mode: RouteMode;
@@ -38,9 +52,12 @@ export type SelectionState = {
   searchOpen: boolean;
   pivoting: boolean;
   holoStage: boolean;
+  crawlOpen: boolean;
   route: RouteState;
   story: StoryState;
   cinematic: CinematicState;
+  timeMachine: { active: boolean; paused: boolean };
+  game: GameState;
 };
 
 type SelectionActions = {
@@ -53,12 +70,13 @@ type SelectionActions = {
   setSearchOpen: (open: boolean) => void;
   setPivoting: (pivoting: boolean) => void;
   setHoloStage: (open: boolean) => void;
+  setCrawlOpen: (open: boolean) => void;
   startRoute: () => void;
   pickEndpoint: (planetId: string) => void;
   clearRoute: () => void;
   reverseRoute: () => void;
   // Story Mode
-  playStory: (id: string) => void;
+  playStory: (id: string, initialBeat?: number) => void;
   pauseStory: () => void;
   resumeStory: () => void;
   setStoryBeat: (i: number) => void;
@@ -67,6 +85,16 @@ type SelectionActions = {
   fireCinematic: (id: string) => void;
   clearCinematic: () => void;
   resetCinematicFired: () => void;
+  // Time Machine
+  startTimeMachine: () => void;
+  stopTimeMachine: () => void;
+  toggleTimeMachinePause: () => void;
+  // Memory Palace Game
+  startGame: (difficulty: GameDifficulty, targetId: string) => void;
+  submitGuess: (planetId: string, isCorrect: boolean) => void;
+  nextRound: (targetId: string) => void;
+  stopGame: () => void;
+  clearFeedback: () => void;
 };
 
 const INITIAL_ROUTE: RouteState = {
@@ -86,6 +114,19 @@ const INITIAL_CINEMATIC: CinematicState = {
   fired: new Set<string>()
 };
 
+const INITIAL_GAME: GameState = {
+  active: false,
+  difficulty: "easy",
+  currentRound: 0,
+  score: 0,
+  targetId: null,
+  feedback: {
+    active: false,
+    lastGuessId: null,
+    isCorrect: false
+  }
+};
+
 const INITIAL: SelectionState = {
   entityId: null,
   entityType: null,
@@ -96,10 +137,15 @@ const INITIAL: SelectionState = {
   searchOpen: false,
   pivoting: false,
   holoStage: false,
+  crawlOpen: false,
   route: INITIAL_ROUTE,
   story: INITIAL_STORY,
-  cinematic: INITIAL_CINEMATIC
+  cinematic: INITIAL_CINEMATIC,
+  timeMachine: { active: false, paused: false },
+  game: INITIAL_GAME
 };
+
+const START_YEAR = -25025;
 
 export const useSelection = create<SelectionState & SelectionActions>((set) => ({
   ...INITIAL,
@@ -112,6 +158,7 @@ export const useSelection = create<SelectionState & SelectionActions>((set) => (
   setSearchOpen: (open) => set({ searchOpen: open }),
   setPivoting: (pivoting) => set({ pivoting }),
   setHoloStage: (open) => set({ holoStage: open }),
+  setCrawlOpen: (open) => set({ crawlOpen: open }),
   startRoute: () =>
     set({
       route: { mode: "picking-origin", originId: null, destinationId: null }
@@ -143,9 +190,9 @@ export const useSelection = create<SelectionState & SelectionActions>((set) => (
     }),
 
   // Story Mode ──────────────────────────────────────────────────────────────
-  playStory: (id) =>
+  playStory: (id, initialBeat = -1) =>
     set({
-      story: { playingStoryId: id, beatIndex: -1, paused: false },
+      story: { playingStoryId: id, beatIndex: initialBeat, paused: false },
       cinematic: { activeId: null, fired: new Set<string>() }
     }),
   pauseStory: () =>
@@ -171,5 +218,63 @@ export const useSelection = create<SelectionState & SelectionActions>((set) => (
   clearCinematic: () =>
     set((s) => ({ cinematic: { ...s.cinematic, activeId: null } })),
   resetCinematicFired: () =>
-    set({ cinematic: { activeId: null, fired: new Set<string>() } })
+    set({ cinematic: { activeId: null, fired: new Set<string>() } }),
+
+  // Time Machine ───────────────────────────────────────────────────────────
+  startTimeMachine: () =>
+    set((s) => ({
+      timeMachine: { active: true, paused: false },
+      era: s.timeMachine.active ? s.era : START_YEAR,
+      story: { ...INITIAL_STORY },
+      cinematic: { activeId: null, fired: new Set<string>() }
+    })),
+  stopTimeMachine: () => set({ timeMachine: { active: false, paused: false } }),
+  toggleTimeMachinePause: () =>
+    set((s) => ({ timeMachine: { ...s.timeMachine, paused: !s.timeMachine.paused } })),
+
+  // Memory Palace Game ──────────────────────────────────────────────────────
+  startGame: (difficulty, targetId) =>
+    set({
+      game: {
+        ...INITIAL_GAME,
+        active: true,
+        difficulty,
+        targetId,
+        currentRound: 1
+      },
+      view: "galaxy"
+    }),
+  submitGuess: (planetId, isCorrect) =>
+    set((s) => ({
+      game: {
+        ...s.game,
+        score: isCorrect ? s.game.score + 1 : s.game.score,
+        feedback: {
+          active: true,
+          lastGuessId: planetId,
+          isCorrect
+        }
+      }
+    })),
+  nextRound: (targetId) =>
+    set((s) => ({
+      game: {
+        ...s.game,
+        targetId,
+        currentRound: s.game.currentRound + 1,
+        feedback: {
+          active: false,
+          lastGuessId: null,
+          isCorrect: false
+        }
+      }
+    })),
+  stopGame: () => set({ game: INITIAL_GAME }),
+  clearFeedback: () =>
+    set((s) => ({
+      game: {
+        ...s.game,
+        feedback: { ...s.game.feedback, active: false }
+      }
+    }))
 }));

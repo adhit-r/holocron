@@ -31,6 +31,15 @@ export function EventMarker({ event, position, era }: Props) {
   const matRef = useRef<THREE.MeshBasicMaterial | null>(null);
 
   const [x, y, z] = position;
+  
+  // Deterministic stagger for events at the same location (e.g. origin)
+  const staggerY = useMemo(() => {
+    let h = 0;
+    for (let i = 0; i < event.id.length; i++) {
+      h = (Math.imul(31, h) + event.id.charCodeAt(i)) | 0;
+    }
+    return (Math.abs(h % 5) * 1.5);
+  }, [event.id]);
 
   // Visibility scalar: 1 at exact year, 0 beyond ±VISIBLE_RADIUS_YEARS,
   // smooth linear in between.
@@ -75,13 +84,13 @@ export function EventMarker({ event, position, era }: Props) {
         <octahedronGeometry args={[1.2, 0]} />
       </mesh>
       <Html
-        position={[0, 2.4, 0]}
+        position={[0, 2.4 + staggerY, 0]}
         center
-        distanceFactor={56}
+        distanceFactor={64}
         style={{ pointerEvents: "none", opacity: Math.min(1, visibility * 1.4) }}
       >
         <div
-          className="whitespace-nowrap rounded-sm border border-border-faint bg-bg-overlay/70 px-2 py-0.5 font-mono text-2xs uppercase tracking-[0.16em] text-fg-primary backdrop-blur-sm"
+          className="whitespace-nowrap rounded-sm border border-border-faint bg-bg-overlay/70 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] text-fg-primary backdrop-blur-sm sm:text-2xs"
           style={{ textShadow: "0 1px 2px oklch(0.09 0.005 240 / 0.9)" }}
         >
           {event.title}

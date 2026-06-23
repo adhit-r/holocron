@@ -8,6 +8,7 @@ import type { LineageGraph } from "@/lib/data/loadLineage";
 import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { useSelection } from "@/lib/store";
+import { findStory } from "@/lib/data/stories";
 import dynamic from "next/dynamic";
 import { GalaxyCanvas } from "@/components/galaxy/GalaxyCanvas";
 import { TimelineView } from "@/components/timeline/TimelineView";
@@ -28,7 +29,8 @@ import { SearchPalette } from "./SearchPalette";
 import { HyperspaceOverlay } from "./HyperspaceOverlay";
 import { AudioCueDispatcher } from "./AudioCueDispatcher";
 import { HoloStage } from "@/components/holostage";
-import { EventInterruptDispatcher, EventInterruptOverlay, StoryMode } from "@/components/cinematic";
+import { EventInterruptDispatcher, EventInterruptOverlay, StoryMode, TimeMachine } from "@/components/cinematic";
+import { MemoryPalace } from "@/components/game/MemoryPalace";
 
 type Props = {
   entities: Entity[];
@@ -74,6 +76,7 @@ export function AppShell({
   const startRoute = useSelection((s) => s.startRoute);
   const clearRoute = useSelection((s) => s.clearRoute);
   const routeMode = useSelection((s) => s.route.mode);
+  const crawlOpen = useSelection((s) => s.crawlOpen);
   const reduceMotion = useReducedMotion();
 
   // Build Motion props for chrome regions. Reduced-motion → `initial={false}`
@@ -120,65 +123,67 @@ export function AppShell({
     return () => window.removeEventListener("keydown", onKey);
   }, [setSearchOpen, startRoute, clearRoute, routeMode]);
 
+  // Handle story deeplinks on mount.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const storyId = params.get("story");
+    const beatStr = params.get("beat");
+    const isPaused = params.get("paused") === "true";
+
+    if (storyId && findStory(storyId)) {
+      const beatIndex = beatStr ? parseInt(beatStr, 10) : -1;
+      useSelection.getState().playStory(storyId, beatIndex);
+      if (isPaused) useSelection.getState().pauseStory();
+    }
+  }, []);
+
   return (
     <div id="main-content" className="relative h-[100dvh] w-full bg-bg-canvas">
       <h1 className="sr-only">Holocron — Star Wars universe explorer</h1>
       {/* Desktop layout (md+): three-column grid + timeline row */}
       <div className="hidden h-full flex-col md:flex">
-        <div className="grid min-h-0 flex-1 grid-cols-[64px_1fr_360px] overflow-hidden">
-          <motion.div {...chrome("x", -32, 0)}>
-            <NavRail />
-          </motion.div>
-          <motion.div className="relative overflow-hidden" {...chrome("y", 16, 0.18)}>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={view}
-                variants={VIEW_VARIANTS}
-                initial={reduceMotion ? false : "initial"}
-                animate="animate"
-                exit="exit"
-                transition={viewTransition}
-                className="absolute inset-0"
-              >
-                {view === "galaxy" && (
-                  <GalaxyCanvas
-                    planets={planets}
-                    lanes={lanes}
-                    entities={entities}
-                    lineage={lineage}
-                  />
-                )}
-                {view === "timeline" && (
-                  <TimelineView
-                    planets={planets}
-                    lanes={lanes}
-                    events={events}
-                    entities={entities}
-                    wars={wars}
-                    battles={battles}
-                  />
-                )}
-                {view === "lineage" &&
-                  (lineage ? <LineageView graph={lineage} /> : <LineagePlaceholder />)}
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-          <motion.div {...chrome("x", 32, 0.06)}>
-            <Datapad
-              entities={entities}
-              planetImages={planetImages}
-              personImages={personImages}
-            />
-          </motion.div>
+        {/* Sidebar width: clamp(260, 22vw, 400) — at 1920px width, 22vw
+            (422px) exceeds the Datapad's calibrated max of ~360-400px. */}
+        <div className="grid min-h-0 flex-1 grid-cols-[64px_1fr_clamp(260px,22vw,400px)] overflow-hidden">
+          <NavRail />
+          <div className="relative overflow-hidden">
+            {view === "galaxy" && (
+              <GalaxyCanvas
+                planets={planets}
+                lanes={lanes}
+                entities={entities}
+                lineage={lineage}
+              />
+            )}
+            {view === "timeline" && (
+              <TimelineView
+                planets={planets}
+                lanes={lanes}
+                events={events}
+                entities={entities}
+                wars={wars}
+                battles={battles}
+              />
+            )}
+            {view === "lineage" &&
+              (lineage ? <LineageView graph={lineage} /> : <LineagePlaceholder />)}
+          </div>
+          <Datapad
+            entities={entities}
+            planetImages={planetImages}
+            personImages={personImages}
+          />
         </div>
-        <motion.div {...chrome("y", 24, 0.12)}>
+        {/* Hide (don't unmount) the scrubber while the cinematic crawl is open
+            so internal state — scrub position, faction toggles — survives. */}
+        <motion.div {...chrome("y", 24, 0.12)} className={crawlOpen ? "hidden" : ""}>
           <TimelineScrubber />
         </motion.div>
       </div>
 
       {/* Mobile layout (< md): stacked column */}
       <div className="flex h-full flex-col md:hidden">
-        <motion.div {...chrome("y", -16, 0)}>
+        <motion.div {...chrome("y", -16, 0)} className={crawlOpen ? "hidden" : ""}>
           <NavRail />
         </motion.div>
         <motion.div className="relative min-h-0 flex-1 overflow-hidden" {...chrome("y", 16, 0.12)}>
@@ -215,7 +220,7 @@ export function AppShell({
             </motion.div>
           </AnimatePresence>
         </motion.div>
-        <motion.div {...chrome("y", 24, 0.18)}>
+        <motion.div {...chrome("y", 24, 0.18)} className={crawlOpen ? "hidden" : ""}>
           <TimelineScrubber />
         </motion.div>
         <DatapadDrawer
@@ -232,6 +237,8 @@ export function AppShell({
       <EventInterruptDispatcher />
       <EventInterruptOverlay />
       <StoryMode />
+      <TimeMachine />
+      <MemoryPalace />
     </div>
   );
 }

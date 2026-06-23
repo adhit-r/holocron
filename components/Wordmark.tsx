@@ -4,6 +4,7 @@ type Props = {
   className?: string;
   size?: "sm" | "md" | "lg";
   showSubhead?: boolean;
+  forceGreen?: boolean;
 };
 
 const SIZE_MAP = {
@@ -12,12 +13,17 @@ const SIZE_MAP = {
   lg: { wm: "text-2xl", glyph: 30, gap: "gap-3", letter: "tracking-[0.08em]" }
 } as const;
 
-export function Wordmark({ className, size = "md", showSubhead = false }: Props) {
+export function Wordmark({
+  className,
+  size = "md",
+  showSubhead = false,
+  forceGreen = false
+}: Props) {
   const s = SIZE_MAP[size];
   return (
     <div className={cn("inline-flex flex-col", className)}>
       <span className={cn("inline-flex items-center", s.gap)} aria-label="Holocron">
-        <HolocronGlyph size={s.glyph} />
+        <HolocronGlyph size={s.glyph} forceGreen={forceGreen} />
         <span
           className={cn(
             "font-sans font-medium uppercase text-fg-strong",
@@ -43,10 +49,12 @@ export function Wordmark({ className, size = "md", showSubhead = false }: Props)
 
 export function HolocronGlyph({
   size = 20,
-  className
+  className,
+  forceGreen = false
 }: {
   size?: number;
   className?: string;
+  forceGreen?: boolean;
 }) {
   return (
     <svg
@@ -54,7 +62,7 @@ export function HolocronGlyph({
       width={size}
       height={size}
       aria-hidden
-      className={cn("text-accent", className)}
+      className={cn(forceGreen ? "text-success" : "text-accent", className)}
     >
       <g
         stroke="currentColor"
