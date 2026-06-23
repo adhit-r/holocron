@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
+import { useSelection } from "@/lib/store";
 
 const LEAD_HOLD_MS = 4200;
 const TITLE_HOLD_MS = 3300;
@@ -22,6 +23,7 @@ const CRAWL_BODY: string[] = [
 type Phase = "init" | "lead" | "title" | "crawl" | "done";
 
 export function OpeningCrawl() {
+  const setGlobalCrawlOpen = useSelection((s) => s.setCrawlOpen);
   const [show, setShow] = useState(false);
   const [phase, setPhase] = useState<Phase>("init");
 
@@ -31,7 +33,8 @@ export function OpeningCrawl() {
     } catch {}
     setShow(false);
     setPhase("done");
-  }, []);
+    setGlobalCrawlOpen(false);
+  }, [setGlobalCrawlOpen]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -61,6 +64,7 @@ export function OpeningCrawl() {
 
     setShow(true);
     setPhase("lead");
+    setGlobalCrawlOpen(true);
 
     const t1 = window.setTimeout(() => setPhase("title"), LEAD_HOLD_MS);
     const t2 = window.setTimeout(() => setPhase("crawl"), LEAD_HOLD_MS + TITLE_HOLD_MS);
@@ -248,7 +252,7 @@ function SkipButton({ onSkip }: { onSkip: () => void }) {
         e.stopPropagation();
         onSkip();
       }}
-      className="fixed right-5 top-5 z-[91] inline-flex items-center gap-2 rounded-full border border-border-faint bg-bg-canvas/60 px-3 py-1.5 font-mono text-2xs uppercase tracking-[0.16em] text-fg-muted backdrop-blur-md transition-colors hover:border-border-line hover:text-fg-primary"
+      className="fixed right-5 top-8 z-[91] inline-flex items-center gap-2 rounded-full border border-border-faint bg-bg-canvas/60 px-4 py-2 font-mono text-2xs uppercase tracking-[0.16em] text-fg-muted backdrop-blur-md transition-colors hover:border-border-line hover:text-fg-primary"
       aria-label="Skip opening sequence"
     >
       Skip intro

@@ -365,16 +365,17 @@ function SceneController({ planets }: { planets: PlacedPlanet[] }) {
 function CornerHud() {
   return (
     <div className="pointer-events-none absolute inset-0">
-      <div className="absolute left-4 top-4 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
+      <div className="absolute left-6 top-6 hidden font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim sm:block">
         Galaxy view
       </div>
-      <div className="absolute right-4 top-4 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
+      <div className="absolute right-6 top-6 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
         Sector grid · 1500 pc
       </div>
-      <div className="absolute bottom-4 left-4 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
-        Drag to orbit · scroll to zoom · R to plot route
+      <div className="absolute bottom-6 left-6 flex flex-col gap-1 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
+        <span>Drag to orbit · scroll to zoom</span>
+        <span className="hidden sm:inline">· R to plot route</span>
       </div>
-      <div className="absolute bottom-4 right-4 font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
+      <div className="absolute bottom-6 right-6 hidden font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim sm:block">
         WebGL2 · 60 fps
       </div>
     </div>

@@ -79,7 +79,7 @@ export function NavRail() {
             aria-label="Open search"
             title="Search · /"
           >
-            <MagnifyingGlass size={16} weight="regular" />
+            <MagnifyingGlass size={18} weight="regular" />
           </button>
 
           <div role="separator" className="h-px w-6 bg-border-faint" />
@@ -95,19 +95,13 @@ export function NavRail() {
                 type="button"
                 onClick={() => setView(id)}
                 className={cn(
-                  "relative rounded-md p-2.5 transition-colors",
-                  view === id ? "text-fg-strong" : "text-fg-muted hover:text-fg-primary"
+                  "rounded-md p-2.5 transition-colors",
+                  view === id
+                    ? "bg-accent-bg/60 text-fg-strong"
+                    : "text-fg-muted hover:bg-bg-panel/40 hover:text-fg-primary"
                 )}
               >
-                {view === id && (
-                  <motion.span
-                    layoutId="nav-tab-indicator-desktop"
-                    aria-hidden
-                    className="absolute inset-0 rounded-md bg-accent-bg/60"
-                    transition={tabTransition}
-                  />
-                )}
-                <Icon size={16} weight="regular" className="relative" />
+                <Icon size={18} weight="regular" />
               </button>
             ))}
           </div>
@@ -130,7 +124,7 @@ export function NavRail() {
             aria-label="Plot a hyperspace route"
             title="Plot a hyperspace route · R"
           >
-            <Path size={16} weight="regular" />
+            <Path size={18} weight="regular" />
           </button>
 
           <button
@@ -229,26 +223,22 @@ export function NavRail() {
 
       {/* Mobile: horizontal mini-bar */}
       <nav
-        className="flex h-12 w-full items-center justify-between border-b border-border-faint bg-bg-canvas/80 px-3 backdrop-blur-md md:hidden"
+        className="flex h-14 w-full items-center justify-between border-b border-border-faint bg-bg-canvas/80 px-3 backdrop-blur-md md:hidden"
         aria-label="Holocron navigation"
       >
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 min-w-0 flex-1">
           <Link
             href="/"
-            className="group relative rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
+            className="flex-shrink-0 rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
             aria-label="Back to landing"
           >
-            <CaretLeft size={16} weight="regular" />
-            <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.15em] text-fg-dim opacity-0 transition-opacity group-hover:opacity-100">
-              Aurebesh: <span className="text-fg-muted">K</span> (Krill)
-            </span>
+            <CaretLeft size={20} weight="regular" />
           </Link>
 
           <div
-            className="flex items-center gap-1 overflow-x-auto"
+            className="flex items-center gap-0.5 overflow-x-auto"
             role="tablist"
             aria-label="View"
-            style={{ scrollbarWidth: "none" }}
           >
             {VIEWS.map(({ id, label, Icon }) => (
               <button
@@ -256,129 +246,124 @@ export function NavRail() {
                 role="tab"
                 aria-selected={view === id}
                 aria-label={label}
+                title={label}
                 type="button"
                 onClick={() => setView(id)}
                 className={cn(
-                  "relative flex flex-shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 transition-colors",
-                  view === id ? "text-fg-strong" : "text-fg-muted hover:text-fg-primary"
+                  "flex flex-shrink-0 items-center justify-center rounded-md p-2.5 transition-colors",
+                  view === id
+                    ? "bg-accent-bg/60 text-fg-strong"
+                    : "text-fg-muted hover:bg-bg-panel/40 hover:text-fg-primary"
                 )}
               >
-                {view === id && (
-                  <motion.span
-                    layoutId="nav-tab-indicator-mobile"
-                    aria-hidden
-                    className="absolute inset-0 rounded-md bg-accent-bg/60"
-                    transition={tabTransition}
-                  />
-                )}
-                <Icon size={14} weight="regular" className="relative" />
-                <span className="relative font-mono text-2xs uppercase tracking-[0.12em]">{label}</span>
+                <Icon size={20} weight="regular" />
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-0.5">
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="rounded-md border border-border-faint bg-bg-panel/40 p-2.5 text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+            className="rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
             aria-label="Open search"
           >
-            <MagnifyingGlass size={14} weight="regular" />
+            <MagnifyingGlass size={20} weight="regular" />
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (view !== "galaxy") setView("galaxy");
-              startRoute();
-            }}
-            className={cn(
-              "rounded-md border p-2.5 transition-colors",
-              routeActive
-                ? "border-accent/60 bg-accent-bg/50 text-fg-strong"
-                : "border-border-faint bg-bg-panel/40 text-fg-muted hover:border-border-line hover:text-fg-primary"
-            )}
-            aria-pressed={routeActive}
-            aria-label="Plot a hyperspace route"
-          >
-            <Path size={14} weight="regular" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (view !== "galaxy") setView("galaxy");
-              playStory("rise-of-vader");
-            }}
-            className={cn(
-              "relative rounded-md border p-2.5 transition-colors",
-              storyActive
-                ? "border-accent/60 bg-accent-bg/50 text-fg-strong"
-                : "border-border-faint bg-bg-panel/40 text-fg-muted hover:border-border-line hover:text-fg-primary"
-            )}
-            aria-pressed={storyActive}
-            aria-label="Play story: Rise of Vader"
-          >
-            <Play size={14} weight="regular" />
-            <AnimatePresence>
-              {storyAbbr && (
-                <motion.span
-                  initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
-                  className="absolute -bottom-1 -right-1 flex h-4 min-w-[1.2rem] items-center justify-center rounded-sm bg-accent px-0.5 font-mono text-[8px] font-bold uppercase leading-none text-accent-fg shadow-sm"
-                  aria-live="polite"
-                >
-                  {storyAbbr}
-                </motion.span>
+
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                if (view !== "galaxy") setView("galaxy");
+                startRoute();
+              }}
+              className={cn(
+                "rounded-md p-2.5 transition-colors",
+                routeActive
+                  ? "bg-accent-bg/50 text-fg-strong"
+                  : "text-fg-muted hover:text-fg-primary"
               )}
-            </AnimatePresence>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (timeMachineActive) stopTimeMachine();
-              else startTimeMachine();
-            }}
-            className={cn(
-              "rounded-md border p-2.5 transition-colors",
-              timeMachineActive
-                ? "border-accent/60 bg-accent-bg/50 text-accent shadow-[0_0_10px_var(--color-accent-faint)]"
-                : "border-border-faint bg-bg-panel/40 text-fg-muted hover:border-border-line hover:text-fg-primary"
-            )}
-            aria-pressed={timeMachineActive}
-            aria-label="Toggle Time Machine"
-          >
-            <Rocket 
-              size={14} 
-              weight={timeMachineActive ? "fill" : "regular"} 
-              className={cn(timeMachineActive && "animate-pulse")}
-            />
-          </button>
-          <button
-            type="button"
-            onClick={toggleLegends}
-            className={cn(
-              "rounded-md border px-2 py-1.5 font-mono text-2xs uppercase tracking-[0.08em] transition-colors",
-              showLegends
-                ? "border-legends/50 bg-legends/10 text-legends"
-                : "border-border-faint text-fg-muted"
-            )}
-            aria-pressed={showLegends}
-            aria-label={showLegends ? "Legends layer on" : "Legends layer off"}
-          >
-            {showLegends ? "+ Legends" : "Legends"}
-          </button>
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent("holocron:open-game"))}
-            className="rounded-md border border-border-faint p-2.5 text-fg-muted"
-            aria-label="Play Memory Palace"
-          >
-            <Brain size={14} weight="regular" />
-          </button>
-          <AtlasToggle size="mini" />
-          <AudioToggle size="mini" />
+              aria-pressed={routeActive}
+              aria-label="Plot a hyperspace route"
+            >
+              <Path size={20} weight="regular" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (view !== "galaxy") setView("galaxy");
+                playStory("rise-of-vader");
+              }}
+              className={cn(
+                "relative rounded-md p-2.5 transition-colors",
+                storyActive ? "bg-accent-bg/50 text-fg-strong" : "text-fg-muted hover:text-fg-primary"
+              )}
+              aria-pressed={storyActive}
+              aria-label="Play story: Rise of Vader"
+            >
+              <Play size={20} weight="regular" />
+              <AnimatePresence>
+                {storyAbbr && (
+                  <motion.span
+                    initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
+                    className="absolute -bottom-1 -right-1 flex h-4 min-w-[1.2rem] items-center justify-center rounded-sm bg-accent px-0.5 font-mono text-[8px] font-bold uppercase leading-none text-accent-fg shadow-sm"
+                    aria-live="polite"
+                  >
+                    {storyAbbr}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (timeMachineActive) stopTimeMachine();
+                else startTimeMachine();
+              }}
+              className={cn(
+                "rounded-md p-2.5 transition-colors",
+                timeMachineActive ? "bg-accent-bg/50 text-accent" : "text-fg-muted hover:text-fg-primary"
+              )}
+              aria-pressed={timeMachineActive}
+              aria-label="Toggle Time Machine"
+            >
+              <Rocket
+                size={20}
+                weight={timeMachineActive ? "fill" : "regular"}
+                className={cn(timeMachineActive && "animate-pulse")}
+              />
+            </button>
+            <button
+              type="button"
+              onClick={toggleLegends}
+              aria-pressed={showLegends}
+              aria-label={showLegends ? "Legends layer on" : "Legends layer off"}
+              title={showLegends ? "Legends layer on" : "Legends layer off"}
+              className={cn(
+                "flex items-center gap-1 rounded-md border px-2 py-1.5 font-mono text-2xs uppercase tracking-[0.08em] transition-colors",
+                showLegends
+                  ? "border-legends/50 bg-legends/10 text-legends"
+                  : "border-border-faint text-fg-muted hover:border-border-line hover:text-fg-primary"
+              )}
+            >
+              <span className="font-semibold">L</span>
+              {showLegends && <span>on</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent("holocron:open-game"))}
+              className="rounded-md p-2.5 text-fg-muted transition-colors hover:text-fg-primary"
+              aria-label="Play Memory Palace"
+            >
+              <Brain size={20} weight="regular" />
+            </button>
+            <AtlasToggle size="mini" />
+            <AudioToggle size="mini" />
+          </div>
         </div>
       </nav>
     </>
