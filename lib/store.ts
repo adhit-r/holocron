@@ -6,6 +6,20 @@ import type { EntityType } from "./schema";
 export type ViewMode = "galaxy" | "timeline" | "lineage";
 
 export type RouteMode = "idle" | "picking-origin" | "picking-destination" | "shown";
+export type GameDifficulty = "easy" | "medium" | "legends";
+
+export type GameState = {
+  active: boolean;
+  difficulty: GameDifficulty;
+  currentRound: number;
+  score: number;
+  targetId: string | null;
+  feedback: {
+    active: boolean;
+    lastGuessId: string | null;
+    isCorrect: boolean;
+  };
+};
 
 export type RouteState = {
   mode: RouteMode;
@@ -42,6 +56,7 @@ export type SelectionState = {
   story: StoryState;
   cinematic: CinematicState;
   timeMachine: { active: boolean; paused: boolean };
+  game: GameState;
 };
 
 type SelectionActions = {
@@ -59,7 +74,7 @@ type SelectionActions = {
   clearRoute: () => void;
   reverseRoute: () => void;
   // Story Mode
-  playStory: (id: string) => void;
+  playStory: (id: string, initialBeat?: number) => void;
   pauseStory: () => void;
   resumeStory: () => void;
   setStoryBeat: (i: number) => void;
@@ -72,6 +87,12 @@ type SelectionActions = {
   startTimeMachine: () => void;
   stopTimeMachine: () => void;
   toggleTimeMachinePause: () => void;
+  // Memory Palace Game
+  startGame: (difficulty: GameDifficulty, targetId: string) => void;
+  submitGuess: (planetId: string, isCorrect: boolean) => void;
+  nextRound: (targetId: string) => void;
+  stopGame: () => void;
+  clearFeedback: () => void;
 };
 
 const INITIAL_ROUTE: RouteState = {
@@ -91,6 +112,19 @@ const INITIAL_CINEMATIC: CinematicState = {
   fired: new Set<string>()
 };
 
+const INITIAL_GAME: GameState = {
+  active: false,
+  difficulty: "easy",
+  currentRound: 0,
+  score: 0,
+  targetId: null,
+  feedback: {
+    active: false,
+    lastGuessId: null,
+    isCorrect: false
+  }
+};
+
 const INITIAL: SelectionState = {
   entityId: null,
   entityType: null,
@@ -104,7 +138,8 @@ const INITIAL: SelectionState = {
   route: INITIAL_ROUTE,
   story: INITIAL_STORY,
   cinematic: INITIAL_CINEMATIC,
-  timeMachine: { active: false, paused: false }
+  timeMachine: { active: false, paused: false },
+  game: INITIAL_GAME
 };
 
 const START_YEAR = -25025;
@@ -151,9 +186,9 @@ export const useSelection = create<SelectionState & SelectionActions>((set) => (
     }),
 
   // Story Mode ──────────────────────────────────────────────────────────────
-  playStory: (id) =>
+  playStory: (id, initialBeat = -1) =>
     set({
-      story: { playingStoryId: id, beatIndex: -1, paused: false },
+      story: { playingStoryId: id, beatIndex: initialBeat, paused: false },
       cinematic: { activeId: null, fired: new Set<string>() }
     }),
   pauseStory: () =>
@@ -180,6 +215,7 @@ export const useSelection = create<SelectionState & SelectionActions>((set) => (
     set((s) => ({ cinematic: { ...s.cinematic, activeId: null } })),
   resetCinematicFired: () =>
     set({ cinematic: { activeId: null, fired: new Set<string>() } }),
+
   // Time Machine ───────────────────────────────────────────────────────────
   startTimeMachine: () =>
     set((s) => ({
@@ -190,5 +226,51 @@ export const useSelection = create<SelectionState & SelectionActions>((set) => (
     })),
   stopTimeMachine: () => set({ timeMachine: { active: false, paused: false } }),
   toggleTimeMachinePause: () =>
-    set((s) => ({ timeMachine: { ...s.timeMachine, paused: !s.timeMachine.paused } }))
+    set((s) => ({ timeMachine: { ...s.timeMachine, paused: !s.timeMachine.paused } })),
+
+  // Memory Palace Game ──────────────────────────────────────────────────────
+  startGame: (difficulty, targetId) =>
+    set({
+      game: {
+        ...INITIAL_GAME,
+        active: true,
+        difficulty,
+        targetId,
+        currentRound: 1
+      },
+      view: "galaxy"
+    }),
+  submitGuess: (planetId, isCorrect) =>
+    set((s) => ({
+      game: {
+        ...s.game,
+        score: isCorrect ? s.game.score + 1 : s.game.score,
+        feedback: {
+          active: true,
+          lastGuessId: planetId,
+          isCorrect
+        }
+      }
+    })),
+  nextRound: (targetId) =>
+    set((s) => ({
+      game: {
+        ...s.game,
+        targetId,
+        currentRound: s.game.currentRound + 1,
+        feedback: {
+          active: false,
+          lastGuessId: null,
+          isCorrect: false
+        }
+      }
+    })),
+  stopGame: () => set({ game: INITIAL_GAME }),
+  clearFeedback: () =>
+    set((s) => ({
+      game: {
+        ...s.game,
+        feedback: { ...s.game.feedback, active: false }
+      }
+    }))
 }));
