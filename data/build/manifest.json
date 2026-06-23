@@ -41,5 +41,7 @@
   "planetImagesBuiltAt": "2026-05-07T20:26:24.158Z",
   "personImages": 34,
   "personImagesBuiltAt": "2026-05-07T20:27:38.751Z",
-  "sequelPlanetsAdded": 8
+  "sequelPlanetsAdded": 8,
+  "llmEnrichedCount": 1,
+  "llmBuiltAt": "2026-05-13T11:31:07.150Z"
 }

@@ -13,6 +13,7 @@
     "build:lineage": "tsx scripts/build-lineage.ts",
     "build:embeddings": "tsx scripts/build-embeddings.ts",
     "build:descriptions": "tsx scripts/build-descriptions.ts",
+    "build:llm-descriptions": "tsx scripts/build-llm-descriptions.ts",
     "build:wars": "tsx scripts/build-wars.ts",
     "build:legends": "tsx scripts/build-legends-content.ts",
     "build:planet-images": "tsx scripts/build-planet-images.ts",
