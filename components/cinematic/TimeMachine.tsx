@@ -34,8 +34,8 @@ export function TimeMachine() {
   const [currentEra, setCurrentEra] = useState(START_YEAR);
   const [nextEventYear, setNextEventYear] = useState<number | null>(null);
 
-  const requestRef = useRef<number>();
-  const lastTimeRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
   const eraRef = useRef(START_YEAR);
 
   // Sync internal ref with store era when starting or when changed externally
@@ -54,12 +54,12 @@ export function TimeMachine() {
   useEffect(() => {
     if (!active || paused) {
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
-      lastTimeRef.current = undefined;
+      lastTimeRef.current = null;
       return;
     }
 
     const animate = (time: number) => {
-      if (lastTimeRef.current === undefined) {
+      if (lastTimeRef.current === null) {
         lastTimeRef.current = time;
         requestRef.current = requestAnimationFrame(animate);
         return;

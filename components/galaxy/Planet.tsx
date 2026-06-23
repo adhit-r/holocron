@@ -112,7 +112,8 @@ function PlanetImpl({ planet, showLabel = true }: Props) {
     
     // Update shader uniforms
     if (near) {
-      shaderMaterial.uniforms.uTime.value = reduceMotion ? 0 : clock.elapsedTime;
+      const timeUniform = shaderMaterial.uniforms.uTime;
+      if (timeUniform) timeUniform.value = reduceMotion ? 0 : clock.elapsedTime;
     }
 
     // Update halo
