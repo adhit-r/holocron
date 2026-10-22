@@ -68,7 +68,7 @@ export function TimelineScrubber() {
           handlePointer(e);
         }}
         onPointerMove={(e) => {
-          if (e.buttons === 1) handlePointer(e);
+          if (e.pointerType === "touch" || e.buttons === 1) handlePointer(e);
         }}
         onKeyDown={(e) => {
           const step = e.shiftKey ? 1000 : 100;

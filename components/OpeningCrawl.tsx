@@ -256,7 +256,7 @@ function SkipButton({ onSkip }: { onSkip: () => void }) {
       aria-label="Skip opening sequence"
     >
       Skip intro
-      <kbd className="rounded border border-border-faint px-1 py-0.5 text-[9px]">esc</kbd>
+      <kbd className="hidden rounded border border-border-faint px-1 py-0.5 text-[9px] md:inline">esc</kbd>
     </button>
   );
 }

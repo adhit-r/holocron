@@ -174,7 +174,7 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
       <div
         ref={scrollRef}
         id="datapad-drawer-content"
-        className="h-[calc(70vh-56px)] overflow-y-auto"
+        className="h-[calc(70vh-56px)] overflow-y-auto overscroll-contain touch-pan-y"
         hidden={!expanded}
         aria-hidden={!expanded}
       >
