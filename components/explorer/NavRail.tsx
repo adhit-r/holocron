@@ -18,6 +18,8 @@ import { cn } from "@/lib/utils";
 import { AtlasToggle } from "./AtlasToggle";
 import { AudioToggle } from "./AudioToggle";
 import { STORIES } from "@/lib/data/stories";
+import { VoiceControl } from "./VoiceControl";
+import type { Entity } from "@/lib/schema";
 
 const STORY_ABBRS: Record<string, string> = {
   "rise-of-vader": "RoV",
@@ -34,7 +36,7 @@ const VIEWS: Array<{ id: ViewMode; label: string; Icon: typeof GlobeHemisphereWe
   { id: "lineage", label: "Lineage", Icon: TreeStructure }
 ];
 
-export function NavRail() {
+export function NavRail({ entities = [] }: { entities?: Entity[] }) {
   const view = useSelection((s) => s.view);
   const setView = useSelection((s) => s.setView);
   const setSearchOpen = useSelection((s) => s.setSearchOpen);
@@ -108,6 +110,7 @@ export function NavRail() {
         </div>
 
         <div className="flex flex-col items-center gap-3">
+          {entities.length > 0 && <VoiceControl entities={entities} />}
           <button
             type="button"
             onClick={() => {
