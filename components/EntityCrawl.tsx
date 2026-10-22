@@ -55,13 +55,8 @@ export function EntityCrawl({ entity, entities, open, onClose }: Props) {
       window.clearTimeout(t2);
       window.clearTimeout(t3);
       window.clearTimeout(t4);
-      // Defensive: if `open` is flipped false externally (parent unmounted,
-      // route change, etc.) without `finish()` firing, the global crawlOpen
-      // slice would stay `true` and AppShell would hide chrome forever.
-      // Calling it here is idempotent with the finish() path.
-      setGlobalCrawlOpen(false);
     };
-  }, [open, entity, finish, setGlobalCrawlOpen]);
+  }, [open, entity, finish]);
 
   // Keyboard skip: Esc, Enter, Space
   useEffect(() => {
@@ -273,7 +268,7 @@ function SkipButton({ onSkip }: { onSkip: () => void }) {
       aria-label="Skip dossier sequence"
     >
       Skip crawl
-      <kbd className="rounded border border-border-faint px-1 py-0.5 text-[9px]">esc</kbd>
+      <kbd className="hidden rounded border border-border-faint px-1 py-0.5 text-[9px] md:inline">esc</kbd>
     </button>
   );
 }

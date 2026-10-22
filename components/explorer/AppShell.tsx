@@ -216,7 +216,8 @@ export function AppShell({
                   battles={battles}
                 />
               )}
-              {view === "lineage" && <LineagePlaceholder />}
+              {view === "lineage" &&
+                (lineage ? <LineageView graph={lineage} /> : <LineagePlaceholder />)}
             </motion.div>
           </AnimatePresence>
         </motion.div>

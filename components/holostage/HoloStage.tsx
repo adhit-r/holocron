@@ -553,12 +553,19 @@ function StageOverlay({
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.42, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-        className="pointer-events-none absolute left-8 top-8 flex max-w-[40ch] flex-col gap-1"
+        className="pointer-events-none absolute left-4 top-4 flex max-w-[calc(100vw-70px)] flex-col gap-1 md:left-8 md:top-8 md:max-w-[40ch]"
       >
-        <span className="font-mono text-2xs uppercase tracking-[0.2em] text-fg-dim">
-          Holocron projection · {entity.canonicity}
-        </span>
-        <h2 className="text-3xl font-medium leading-tight tracking-tight text-fg-strong">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-2xs uppercase tracking-[0.2em] text-fg-dim">
+            Holocron projection · {entity.canonicity}
+          </span>
+          <span
+            className={`pointer-events-auto inline-flex items-center rounded border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] md:hidden ${sideClass}`}
+          >
+            {sideLabel}
+          </span>
+        </div>
+        <h2 className="text-2xl font-medium leading-tight tracking-tight text-fg-strong md:text-3xl">
           {entity.name}
         </h2>
         {entity.aliases.length > 0 && (
@@ -567,20 +574,30 @@ function StageOverlay({
         {entity.era && <EraLine era={entity.era} />}
       </motion.div>
 
-      {/* Top-right side classification + factions */}
+      {/* Top-right close button (always touch accessible) + side/factions on desktop */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.42, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        className="pointer-events-none absolute right-8 top-8 flex flex-col items-end gap-2"
+        className="pointer-events-none absolute right-4 top-4 flex flex-col items-end gap-2 md:right-8 md:top-8"
       >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close hologram"
+          className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-border-faint bg-bg-overlay/80 px-3 py-1.5 text-fg-muted backdrop-blur-md transition-colors hover:border-border-line hover:text-fg-primary md:rounded-md"
+        >
+          <kbd className="hidden font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim md:inline">Esc</kbd>
+          <X size={15} weight="regular" />
+        </button>
+
         <span
-          className={`pointer-events-auto inline-flex items-center rounded border px-3 py-1 font-mono text-2xs uppercase tracking-[0.2em] ${sideClass}`}
+          className={`pointer-events-auto hidden items-center rounded border px-3 py-1 font-mono text-2xs uppercase tracking-[0.2em] md:inline-flex ${sideClass}`}
         >
           {sideLabel}
         </span>
         {factionTags.length > 0 && (
-          <div className="flex flex-wrap justify-end gap-1">
+          <div className="hidden flex-wrap justify-end gap-1 md:flex">
             {factionTags.map((f) => (
               <span
                 key={f}
@@ -591,15 +608,6 @@ function StageOverlay({
             ))}
           </div>
         )}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close hologram"
-          className="pointer-events-auto mt-2 flex items-center gap-2 rounded border border-border-faint bg-bg-overlay/60 px-3 py-1.5 text-fg-muted backdrop-blur-sm transition-colors hover:border-border-line hover:text-fg-primary"
-        >
-          <kbd className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">Esc</kbd>
-          <X size={13} weight="regular" />
-        </button>
       </motion.div>
 
       {/* Bottom-center quote ticker */}
@@ -607,7 +615,7 @@ function StageOverlay({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="pointer-events-none absolute bottom-16 left-1/2 -translate-x-1/2"
+        className="pointer-events-none absolute bottom-12 left-1/2 -translate-x-1/2 w-[min(92vw,560px)] md:bottom-16"
       >
         <QuoteTrack quotes={quotes} />
       </motion.div>
@@ -617,7 +625,7 @@ function StageOverlay({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute bottom-6 right-8 flex flex-col items-end gap-0.5"
+        className="hidden absolute bottom-6 right-8 flex-col items-end gap-0.5 md:flex"
       >
         <span className="font-mono text-2xs uppercase tracking-[0.2em] text-fg-dim">
           Resolved by

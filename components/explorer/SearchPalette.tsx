@@ -216,6 +216,14 @@ export function SearchPalette({ entities }: Props) {
               <kbd className="hidden items-center gap-1 rounded border border-border-faint px-1.5 py-0.5 font-mono text-2xs text-fg-dim md:inline-flex">
                 <Command size={10} weight="regular" />K
               </kbd>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded border border-border-faint px-2 py-1 font-mono text-2xs uppercase tracking-wider text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary md:hidden"
+                aria-label="Close search"
+              >
+                Done
+              </button>
             </div>
 
             <SemanticStatusRow status={status} />
