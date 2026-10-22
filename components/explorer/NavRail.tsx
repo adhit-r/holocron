@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "motion/react";
 import {
   GlobeHemisphereWest,
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { AtlasToggle } from "./AtlasToggle";
 import { AudioToggle } from "./AudioToggle";
 import { STORIES } from "@/lib/data/stories";
+import { StoriesPicker } from "./StoriesPicker";
 
 const STORY_ABBRS: Record<string, string> = {
   "rise-of-vader": "RoV",
@@ -46,6 +48,7 @@ export function NavRail() {
   const playStory = useSelection((s) => s.playStory);
   const playingStoryId = useSelection((s) => s.story.playingStoryId);
   const storyActive = playingStoryId !== null;
+  const [storiesOpen, setStoriesOpen] = useState(false);
   const storyAbbr = playingStoryId ? STORY_ABBRS[playingStoryId] ?? STORIES.find(s => s.id === playingStoryId)?.title.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase() : null;
   const timeMachineActive = useSelection((s) => s.timeMachine.active);
   const startTimeMachine = useSelection((s) => s.startTimeMachine);
@@ -129,10 +132,7 @@ export function NavRail() {
 
           <button
             type="button"
-            onClick={() => {
-              if (view !== "galaxy") setView("galaxy");
-              playStory("rise-of-vader");
-            }}
+            onClick={() => setStoriesOpen(true)}
             className={cn(
               "relative rounded-md border p-2.5 transition-colors",
               storyActive
@@ -140,8 +140,8 @@ export function NavRail() {
                 : "border-border-faint text-fg-muted hover:border-border-line hover:text-fg-primary"
             )}
             aria-pressed={storyActive}
-            aria-label="Play story: Rise of Vader"
-            title="Play story · Rise of Vader"
+            aria-label="Cinematic Stories Library"
+            title="Cinematic Stories"
           >
             <Play size={16} weight="regular" />
             <AnimatePresence>
@@ -301,7 +301,8 @@ export function NavRail() {
                 storyActive ? "bg-accent-bg/50 text-fg-strong" : "text-fg-muted hover:text-fg-primary"
               )}
               aria-pressed={storyActive}
-              aria-label="Play story: Rise of Vader"
+              aria-label="Cinematic Stories Library"
+              title="Cinematic Stories"
             >
               <Play size={20} weight="regular" />
               <AnimatePresence>
@@ -366,6 +367,11 @@ export function NavRail() {
           </div>
         </div>
       </nav>
+
+      <StoriesPicker
+        open={storiesOpen}
+        onClose={() => setStoriesOpen(false)}
+      />
     </>
   );
 }
