@@ -2,11 +2,11 @@
 
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Battle, FactionId } from "@/lib/schema";
 import { useSelection } from "@/lib/store";
-import { formatYear } from "@/lib/utils";
+import { formatYear, cn } from "@/lib/utils";
 
 type Props = {
   battle: Battle;
@@ -119,6 +119,9 @@ export function BattleMarker({ battle, position, era }: Props) {
   const groupRef = useRef<THREE.Group>(null);
   const matRef = useRef<THREE.MeshBasicMaterial | null>(null);
   const select = useSelection((s) => s.select);
+  const selectedId = useSelection((s) => s.entityId);
+  const isSelected = selectedId === battle.id;
+  const [hovered, setHovered] = useState(false);
 
   const reducedMotion = useMemo(
     () =>
@@ -187,6 +190,13 @@ export function BattleMarker({ battle, position, era }: Props) {
       position={[x, y, z]}
       visible={!culled}
       onPointerDown={onPointerDown}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHovered(true);
+      }}
+      onPointerOut={() => {
+        setHovered(false);
+      }}
     >
       {/* Horizontal arm of the compass star */}
       <mesh material={material} rotation={[0, 0, 0]}>
@@ -210,16 +220,72 @@ export function BattleMarker({ battle, position, era }: Props) {
         position={[0, -2.0, 0]}
         center
         distanceFactor={56}
-        style={{ pointerEvents: "none", opacity: Math.min(1, visibility * 1.4) }}
+        style={{
+          pointerEvents: hovered || isSelected ? "auto" : "none",
+          opacity: Math.min(1, visibility * 1.4),
+          zIndex: hovered || isSelected ? 40 : 10
+        }}
       >
         <div
-          className="whitespace-nowrap rounded-sm border border-border-faint bg-bg-overlay/70 px-2 py-0.5 font-mono text-2xs uppercase tracking-[0.16em] text-fg-primary backdrop-blur-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            select(battle.id, "event");
+          }}
+          className={cn(
+            "cursor-pointer rounded border border-border-faint bg-bg-overlay/95 backdrop-blur-md transition-all shadow-lg text-left",
+            hovered || isSelected
+              ? "p-2.5 min-w-[220px] max-w-xs border-accent/70 shadow-[0_0_15px_rgba(235,160,50,0.25)] ring-1 ring-accent/30"
+              : "px-2 py-0.5 whitespace-nowrap hover:border-border-line"
+          )}
           style={{
-            textShadow: "0 1px 2px oklch(0.09 0.005 240 / 0.9)",
-            color: tone.cssVar
+            textShadow: "0 1px 2px oklch(0.09 0.005 240 / 0.9)"
           }}
         >
-          {`${battle.name} · ${formatYear(battle.year)}`}
+          <div
+            className="font-mono text-2xs uppercase tracking-[0.16em] font-semibold"
+            style={{ color: tone.cssVar }}
+          >
+            {`${battle.name} · ${formatYear(battle.year)}`}
+          </div>
+
+          {(hovered || isSelected) && (
+            <div className="mt-2 flex flex-col gap-1.5 border-t border-border-faint/60 pt-2 font-mono">
+              {battle.outcome && (
+                <div className="text-[10px] text-fg-muted uppercase tracking-wider">
+                  Outcome:{" "}
+                  <span className="font-semibold text-fg-strong">
+                    {battle.outcome}
+                    {battle.winningSide ? ` (${battle.winningSide})` : ""}
+                  </span>
+                </div>
+              )}
+              {battle.shipsInvolved && battle.shipsInvolved.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] uppercase tracking-wider text-fg-dim">
+                    Ships involved ({battle.shipsInvolved.length}):
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {battle.shipsInvolved.slice(0, 4).map((s) => (
+                      <span
+                        key={s}
+                        className="rounded border border-border-faint bg-bg-panel/80 px-1 py-0.5 text-[9px] text-fg-primary"
+                      >
+                        {s.split(" (")[0]}
+                      </span>
+                    ))}
+                    {battle.shipsInvolved.length > 4 && (
+                      <span className="text-[9px] text-fg-dim">
+                        +{battle.shipsInvolved.length - 4} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className="pt-0.5 text-[9px] uppercase tracking-wider text-accent">
+                Click to open datapad &rarr;
+              </div>
+            </div>
+          )}
         </div>
       </Html>
     </group>

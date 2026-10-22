@@ -170,6 +170,7 @@ export function AppShell({
           </div>
           <Datapad
             entities={entities}
+            battles={battles}
             planetImages={planetImages}
             personImages={personImages}
           />
@@ -225,6 +226,7 @@ export function AppShell({
         </motion.div>
         <DatapadDrawer
           entities={entities}
+          battles={battles}
           planetImages={planetImages}
           personImages={personImages}
         />
