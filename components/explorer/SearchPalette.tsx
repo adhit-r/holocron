@@ -52,6 +52,39 @@ function startSemanticWarmup(): void {
 
 type FilterableType = Entity["type"];
 
+const STORAGE_KEY = "holocron:search_filter";
+
+function readStoredFilter(): Set<FilterableType> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      const valid = parsed.filter((id): id is FilterableType =>
+        FILTER_TYPES.some((f) => f.id === id)
+      );
+      return new Set(valid);
+    }
+  } catch {
+    // Ignore JSON / disabled storage errors
+  }
+  return new Set();
+}
+
+function writeStoredFilter(filter: Set<FilterableType>): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (filter.size === 0) {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(filter)));
+    }
+  } catch {
+    // Ignore quota or disabled-storage errors
+  }
+}
+
 const FILTER_TYPES: Array<{ id: FilterableType; label: string }> = [
   { id: "person", label: "People" },
   { id: "planet", label: "Planets" },
@@ -73,10 +106,10 @@ export function SearchPalette({ entities }: Props) {
   const [active, setActive] = useState(0);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<IndexStatus>(indexStatus);
-  const [typeFilter, setTypeFilter] = useState<Set<FilterableType>>(new Set());
+  const [typeFilter, setTypeFilter] = useState<Set<FilterableType>>(readStoredFilter);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Filter hits client-side after the search returns. Filter resets on close.
+  // Filter hits client-side after the search returns.
   const filteredHits =
     typeFilter.size === 0 ? hits : hits.filter((h) => typeFilter.has(h.type));
 
@@ -92,8 +125,27 @@ export function SearchPalette({ entities }: Props) {
 
   function clearFilter() {
     setTypeFilter(new Set());
+    writeStoredFilter(new Set());
     setActive(0);
   }
+
+  // Persist typeFilter to localStorage whenever it changes.
+  useEffect(() => {
+    writeStoredFilter(typeFilter);
+  }, [typeFilter]);
+
+  // Sync with cross-tab / window storage events.
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.key === STORAGE_KEY) {
+        setTypeFilter(readStoredFilter());
+      }
+    }
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
 
   // Subscribe to module-level status changes so all opens see fresh state.
   useEffect(() => {
@@ -109,11 +161,13 @@ export function SearchPalette({ entities }: Props) {
       requestAnimationFrame(() => inputRef.current?.focus());
       // Kick off semantic warmup the first time the palette opens.
       startSemanticWarmup();
+      // Restore persisted filter on open
+      setTypeFilter(readStoredFilter());
     } else {
       setQuery("");
       setHits([]);
       setActive(0);
-      setTypeFilter(new Set());
+      // Note: typeFilter persists across open/close and page reloads.
     }
   }, [open]);
 
