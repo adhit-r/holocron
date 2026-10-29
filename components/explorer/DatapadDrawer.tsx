@@ -2,21 +2,23 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useMemo, useEffect, useRef } from "react";
-import { CaretUp, CaretDown, GlobeHemisphereWest, Clock, TreeStructure, Play, FilmStrip } from "@phosphor-icons/react";
-import type { Entity } from "@/lib/schema";
+import { CaretUp, CaretDown, GlobeHemisphereWest, Clock, TreeStructure } from "@phosphor-icons/react";
+import type { Entity, Battle } from "@/lib/schema";
 import { useSelection, type ViewMode } from "@/lib/store";
 import { formatYear, cn } from "@/lib/utils";
-import { EntityCrawl } from "@/components/EntityCrawl";
 import { loadAllQuotesFor } from "@/lib/data/loadQuotes";
-import { CLIP_LINKS_MAP } from "@/lib/data/clip-links";
 import type { Quote } from "@/lib/data/quotes";
 import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { PlanetDetail } from "@/components/planet/PlanetDetail";
 import { HoloStageButton } from "@/components/holostage";
+import { EntityCrawl } from "@/components/EntityCrawl";
+import { Play } from "@phosphor-icons/react";
+import { BattleDetail } from "./BattleDetail";
 
 type Props = {
   entities: Entity[];
+  battles?: Battle[];
   planetImages?: Map<string, PlanetImage> | null;
   personImages?: Map<string, PersonImage> | null;
 };
@@ -35,17 +37,13 @@ const PIVOT_VIEWS: Array<{
   { id: "lineage", label: "Show on lineage", Icon: TreeStructure, personOnly: true }
 ];
 
-export function DatapadDrawer({ entities, planetImages = null, personImages = null }: Props) {
+export function DatapadDrawer({ entities, battles = [], planetImages = null, personImages = null }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [crawlOpen, setCrawlOpen] = useState(false);
   const selectedId = useSelection((s) => s.entityId);
   const currentView = useSelection((s) => s.view);
   const setView = useSelection((s) => s.setView);
+  const [crawlOpen, setCrawlOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!selectedId) setCrawlOpen(false);
-  }, [selectedId]);
 
   const entityMap = useMemo(() => {
     const m = new Map<string, Entity>();
@@ -53,12 +51,19 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
     return m;
   }, [entities]);
 
+  const battleMap = useMemo(() => {
+    const m = new Map<string, Battle>();
+    for (const b of battles) m.set(b.id, b);
+    return m;
+  }, [battles]);
+
   const entity = selectedId ? entityMap.get(selectedId) : null;
+  const battle = selectedId ? battleMap.get(selectedId) : null;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
     setCrawlOpen(false);
-  }, [entity?.id]);
+  }, [entity?.id, battle?.id]);
 
   return (
     <motion.div
@@ -82,7 +87,14 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
             aria-live="polite"
             aria-atomic="true"
           >
-            {entity ? (
+            {battle ? (
+              <>
+                <span className="font-mono text-2xs uppercase tracking-[0.14em] text-accent">
+                  Battle
+                </span>
+                <span className="truncate text-sm font-medium text-fg-strong">{battle.name}</span>
+              </>
+            ) : entity ? (
               <>
                 <span className="font-mono text-2xs uppercase tracking-[0.14em] text-fg-dim">
                   {entity.type}
@@ -108,37 +120,7 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
         </button>
 
         {entity && (
-          <div className="ml-3 flex items-center gap-1.5">
-            {(entity.type === "person" ||
-              entity.type === "planet" ||
-              entity.type === "ship" ||
-              entity.type === "vehicle" ||
-              entity.type === "film" ||
-              entity.type === "event") && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCrawlOpen(true);
-                }}
-                aria-label="Play crawl"
-                className="flex h-9 w-9 items-center justify-center rounded border border-border-faint text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
-              >
-                <Play size={12} weight="regular" />
-              </button>
-            )}
-            {entity.type === "film" && CLIP_LINKS_MAP.get(entity.id) && (
-              <a
-                href={CLIP_LINKS_MAP.get(entity.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                aria-label="Watch clip"
-                className="flex h-9 w-9 items-center justify-center rounded border border-border-faint text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
-              >
-                <FilmStrip size={13} weight="regular" />
-              </a>
-            )}
+          <div className="ml-3 flex items-center gap-1">
             {PIVOT_VIEWS.map(({ id, label, Icon, personOnly }) => {
               const disabled = personOnly && entity.type !== "person";
               const isActive = currentView === id;
@@ -149,10 +131,7 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
                   aria-label={label}
                   title={label}
                   disabled={disabled}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setView(id);
-                  }}
+                  onClick={() => setView(id)}
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded border transition-colors",
                     isActive
@@ -165,6 +144,16 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
                 </button>
               );
             })}
+            {entity.type === "film" && (
+              <button
+                type="button"
+                onClick={() => setCrawlOpen(true)}
+                className="flex h-9 items-center gap-2 rounded border border-border-faint bg-bg-panel/40 px-3 text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+              >
+                <Play size={14} weight="regular" />
+                <span className="font-mono text-xs uppercase tracking-[0.08em]">Crawl</span>
+              </button>
+            )}
             {entity.type === "person" && <HoloStageButton />}
           </div>
         )}
@@ -174,12 +163,21 @@ export function DatapadDrawer({ entities, planetImages = null, personImages = nu
       <div
         ref={scrollRef}
         id="datapad-drawer-content"
-        className="h-[calc(70vh-56px)] overflow-y-auto"
+        className="h-[calc(70vh-56px)] overflow-y-auto overscroll-contain touch-pan-y"
         hidden={!expanded}
         aria-hidden={!expanded}
       >
         <AnimatePresence mode="wait">
-          {!entity ? (
+          {battle ? (
+            <motion.div
+              key={battle.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <BattleDetail battle={battle} entities={entities} />
+            </motion.div>
+          ) : !entity ? (
             <motion.div
               key="empty"
               initial={{ opacity: 0 }}

@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { GlobeHemisphereWest, Clock, TreeStructure, Play, Path, FilmStrip } from "@phosphor-icons/react";
-import type { Entity } from "@/lib/schema";
+import type { Entity, Battle } from "@/lib/schema";
 import { useSelection, type ViewMode } from "@/lib/store";
 import { formatYear, cn } from "@/lib/utils";
 import { EntityCrawl } from "@/components/EntityCrawl";
@@ -14,10 +14,11 @@ import type { PlanetImage } from "@/lib/data/loadPlanetImages";
 import type { PersonImage } from "@/lib/data/loadPersonImages";
 import { PlanetDetail } from "@/components/planet/PlanetDetail";
 import { HoloStageButton } from "@/components/holostage";
-import { Aurebesh } from "@/components/Aurebesh";
+import { BattleDetail } from "./BattleDetail";
 
 type Props = {
   entities: Entity[];
+  battles?: Battle[];
   planetImages?: Map<string, PlanetImage> | null;
   personImages?: Map<string, PersonImage> | null;
 };
@@ -36,8 +37,9 @@ const PIVOT_VIEWS: Array<{
   { id: "lineage", label: "Show on lineage", Icon: TreeStructure, personOnly: true }
 ];
 
-export function Datapad({ entities, planetImages = null, personImages = null }: Props) {
+export function Datapad({ entities, battles = [], planetImages = null, personImages = null }: Props) {
   const selectedId = useSelection((s) => s.entityId);
+  const select = useSelection((s) => s.select);
   const currentView = useSelection((s) => s.view);
   const setView = useSelection((s) => s.setView);
   const [crawlOpen, setCrawlOpen] = useState(false);
@@ -50,17 +52,24 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
     return m;
   }, [entities]);
 
+  const battleMap = useMemo(() => {
+    const m = new Map<string, Battle>();
+    for (const b of battles) m.set(b.id, b);
+    return m;
+  }, [battles]);
+
   const entity = selectedId ? entityMap.get(selectedId) : null;
+  const battle = selectedId ? battleMap.get(selectedId) : null;
 
   useEffect(() => {
     if (!entity) setCrawlOpen(false);
   }, [entity]);
 
-  // Reset scroll position when the entity changes — otherwise the planet
+  // Reset scroll position when the entity or battle changes — otherwise the planet
   // detail's scroll-collapse can land in a half-collapsed state on pivot.
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
-  }, [entity?.id]);
+  }, [entity?.id, battle?.id]);
 
   return (
     <aside
@@ -70,7 +79,26 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
       <header className="flex items-center justify-between border-b border-border-faint px-5 py-3">
         <h2 className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">Datapad</h2>
         <div className="flex items-center gap-2">
-          {entity && (entity.type === "person" || entity.type === "planet" || entity.type === "ship" || entity.type === "vehicle" || entity.type === "film" || entity.type === "event") && (
+          {battle && battle.planetId && (
+            <button
+              type="button"
+              onClick={() => {
+                setView("galaxy");
+                select(battle.planetId!, "planet");
+              }}
+              className="flex h-9 items-center gap-1.5 rounded border border-border-faint px-2.5 text-fg-muted transition-colors hover:border-border-line hover:text-fg-primary"
+              title="Show battle planet on galaxy"
+            >
+              <GlobeHemisphereWest size={11} weight="regular" />
+              <span className="font-mono text-2xs uppercase tracking-[0.14em]">Planet</span>
+            </button>
+          )}
+          {battle && (
+            <span className="font-mono text-2xs uppercase tracking-[0.16em] text-accent">
+              Battle
+            </span>
+          )}
+          {entity && (
             <button
               type="button"
               onClick={() => setCrawlOpen(true)}
@@ -158,7 +186,17 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <AnimatePresence mode="wait">
-          {!entity ? (
+          {battle ? (
+            <motion.div
+              key={battle.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2 }}
+            >
+              <BattleDetail battle={battle} entities={entities} />
+            </motion.div>
+          ) : !entity ? (
             <EmptyState key="empty" />
           ) : entity.type === "planet" ? (
             <PlanetDetail
@@ -201,7 +239,7 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
               {entity.era && (
                 <div className="flex flex-col gap-1 border-t border-border-faint pt-4">
                   <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
-                    <Aurebesh char="E" />ra
+                    Era
                   </span>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-sm">
                     {entity.era.birthYear != null && (
@@ -227,7 +265,7 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
               {entity.relations.length > 0 && (
                 <div className="flex flex-col gap-2 border-t border-border-faint pt-4">
                   <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
-                    <Aurebesh char="R" />elations
+                    Relations
                   </span>
                   <ul className="flex flex-col divide-y divide-border-faint/60">
                     {entity.relations.slice(0, 14).map((r, i) => {
@@ -254,7 +292,7 @@ export function Datapad({ entities, planetImages = null, personImages = null }: 
               {entity.sources.length > 0 && (
                 <div className="flex flex-col gap-2 border-t border-border-faint pt-4">
                   <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">
-                    <Aurebesh char="S" />ources
+                    Sources
                   </span>
                   <ul className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-2xs text-fg-muted">
                     {entity.sources.map((s) => (
@@ -295,7 +333,7 @@ function LoreSection({ long, entityId }: { long: string; entityId: string }) {
 
   return (
     <div className="flex flex-col gap-1 border-t border-border-faint pt-4">
-      <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim"><Aurebesh char="L" />ore</span>
+      <span className="font-mono text-2xs uppercase tracking-[0.16em] text-fg-dim">Lore</span>
       <motion.div layout transition={LORE_SPRING} className="overflow-hidden">
         <p className="max-w-[65ch] text-base leading-relaxed text-fg-primary/85">{displayText}</p>
         {needsTruncation && (
